@@ -100,7 +100,7 @@ app.post("/Clientdata", (req, res, next) => {
                     "price": "price",
                     "stock": "stock",
                     "description": description,
-                    // "img": "img",
+                    // "img": "im",
                 `)
         return;
     } else {
