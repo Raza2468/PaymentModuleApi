@@ -38,7 +38,7 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
 
 // =======================export
 var otpSchema = new mongoose.Schema({
-    "email": String,
+    "orderId": String,
     "otpCode": String,
     "createdOn": { "type": Date, "default": Date.now },
 });
@@ -65,14 +65,17 @@ var profilepic = mongoose.model("pic", picSchema);
 // ======================>
 
 var orderSchema = mongoose.Schema({
-    orderscart: Array,
-    totalPrice: String,
+    ClientId: String,
+    ClientName: String,
     email: String,
-    name: String,
-    phonenumber: String,
-    address: String,
+    Amount: String,
+    imageUrl: String,
+    orderId: String,
+    // orderscart: Array,
+    // phonenumber: String,
+    // address: String,
+    // remarks: String,
     status: String,
-    remarks: String,
     "createdOn": { "type": Date, "default": Date.now },
 })
 

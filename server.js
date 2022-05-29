@@ -3,22 +3,28 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const admin = require("firebase-admin");
 const multer = require("multer");
-
-
+const morgan = require("morgan");
+const postmark = require("postmark");
 const app = express()
+
+
+
 const { ServerSecretKey, PORT } = require("./core/index")
-const { order, comments, childcomment } = require('./dbase/modules')
+const { order, otpModel, childcomment } = require('./dbase/modules')
 const serviceAccount = require("./firebase/firebase.json");
+const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
+// var client = new postmark.Client("ENTER YOUR POSTMARK TOKEN");
 
 
 
-app.use(express.json())
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({
     origin: "*",
     credentials: true
 }));
-
+app.use(express.json())
+app.use(morgan('short'))
 
 
 
@@ -78,21 +84,206 @@ app.post("/upload", upload.any(), (req, res, next) => {  // never use upload.sin
 
 
 
-app.get('/profile', (req, res) => {
-    order.find({},
-        (err, doc) => {
-            if (!err) {
-                res.send(doc)
+
+app.post("/Clientdata", (req, res, next) => {
+
+    if (!req.body.clientID
+        || !req.body.clientName
+        || !req.body.clientEmail
+        || !req.body.clientAmount
+    ) {
+        res.status(409).send(`
+                    Please send useremail and tweet in json body
+                    e.g:
+                    "productKey":"productKey",
+                    "productname": "productname",
+                    "price": "price",
+                    "stock": "stock",
+                    "description": description,
+                    // "img": "img",
+                `)
+        return;
+    } else {
+        const newUser = new order({
+            ClientId: req.body.clientID,  // user.clientID 
+            ClientName: req.body.clientName,  // user.clientName 
+            email: req.body.clientEmail,  // user.clientEmail 
+            Amount: req.body.clientAmount  // user.clientAmount 
+        })
+        newUser.save().then((data) => {
+            res.send(data)
+        })
+            .catch((err) => {
+                res.status(500).send({
+                    message: "an error occured : " + err,
+                })
+            });
+    }
+})
+
+
+app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu gai otp
+
+    if (!req.body.clientID) {  //!req.body.imageUrl
+        res.status(403).send(`
+        please send email in json body.
+        e.g:
+        {
+            "email": "Razamalik468@gmail.com"
+        }`)
+        return;
+    }
+    order.findOne({ clientID: req.body.clientID },
+
+
+        function (err, user) {
+            if (err) {
+
+                res.status(500).send({
+                    message: "an error occured: " + JSON.stringify(err)
+                });
+            } else if (user) {
+
+                var userupdate = order.updateOne({ imageUrl: req.body.imageUrl })
+
+                const otp = Math.floor(getRandomArbitrary(11111, 99999))
+                otpModel.create({
+                    email: user.email,  // User Email
+                    otpCode: otp
+                }).then((doc) => {
+                    client.sendEmail({
+                        "From": "faiz_student@sysborg.com",
+                        "To": user.email,
+                        "Subject": "Reset your password",
+                        "TextBody": `Here is your pasword reset code: ${otp}`
+                    })
+                }).then((status) => {
+                    console.log("status: ", status);
+                    res.send
+                        ({
+                            status: status,
+                            message: "email sent with otp",
+                        })
+                }).catch((err) => {
+                    console.log("error in creating otp: ", err);
+                    res.status(500).send("unexpected error ")
+                })
+
+
             } else {
-                res.send(err)
+                res.status(403).send({
+                    message: "user not found"
+                });
             }
         })
 
 })
 
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+app.post('/ReciveOtpstep-2', (req, res, next) => {
+    if (!req.body.clientID // order id required 
+        || !req.body.otp
+
+    ) {
+        res.status(403).send(`
+            please send email & otp in json body.
+            e.g:
+            {
+                "email": "malikasinger@gmail.com",
+                "clientID": "xxxxxx",
+                "otp": "xxxxx" 
+            }`)
+        return;
+    }
+    order.findOne({ clientID: req.body.clientID },
+        function (err, user) {
+            if (err) {
+                res.status(500).send({
+                    message: "an error occured: " + JSON.stringify(err)
+                });
+            } else if (user) {
+
+                otpModel.find({ email: req.body.email },
+                    function (err, otpData) {
+
+                        if (err) {
+                            res.status(500).send({
+                                message: "an error occured: " + JSON.stringify(err)
+                            });
+                        } else if (otpData) {
+                            otpData = otpData[otpData.length - 1]
+
+                            console.log("otpData: ", otpData);
+
+                            const now = new Date().getTime();
+                            const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
+                            const diff = now - otpIat; // 300000 5 minute
+
+                            console.log("diff: ", diff);
+
+                            if (otpData.otpCode === req.body.otp && diff < 300000) { // correct otp code
+                                otpData.remove()
+
+                                order.updateOne({ status: req.body.status, status: "true" },
+                                    (err, updatestatus) => {
+                                        if (updatestatus) {
+
+                                            res.send({
+                                                status: "Status Update",
+                                                // status: 200
+                                            })
+                                        }
+                                    })
+
+                                console.log("update");
+
+                            } else {
+                                res.status(401).send({
+                                    message: "incorrect otp"
+                                });
+                            }
+                        } else {
+                            res.status(401).send({
+                                message: "incorrect otp"
+                            });
+                        }
+                    })
+
+            } else {
+                res.status(403).send({
+                    message: "user not found"
+                });
+            }
+        });
+})
+
+
+
+app.get('/', (req, res, next) => {
+    order.find({}, (err, data) => {
+        if (!err) {
+
+            res.send({
+                Data: data,
+            });
+        }
+        else {
+            res.status(500).send("error");
+        }
+    })
+})
+
+
+
+
+
+
+
 app.listen(PORT, () => {
     console.log("start server....", `http://localhost:${PORT}`)
 });
 
-    

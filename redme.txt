@@ -27,3 +27,11 @@ Or otp send kra gae User ki email pa
 
 User email pa sa Otp batai gae, Rider ko or Rider enter kra gae
 Candition MAtch hu gai tu True Warna False     // Match User ID ya Oder ID
+
+
+
+ClientId: req.body.clientID,  // user.clientID 
+ClientName: req.body.clientName,  // user.clientName 
+email: req.body.clientEmail,  // user.clientEmail 
+Amount: req.body.clientAmount,  // user.clientAmount 
+                   
