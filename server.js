@@ -133,10 +133,9 @@ app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu 
             "email": "Razamalik468@gmail.com"
         }`)
         return;
-    }else {
-     
-        order.updateOne({ imageUrl: req.body.imageUrl })
-     
+    } else {
+
+
         order.findOne({ clientID: req.body.clientID },
             function (err, user) {
                 if (err) {
@@ -147,6 +146,7 @@ app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu 
                 } else if (user) {
 
 
+                    var a = order.updateOne({ imageUrl: req.body.imageUrl })
 
                     const otp = Math.floor(getRandomArbitrary(11111, 99999))
                     otpModel.create({
