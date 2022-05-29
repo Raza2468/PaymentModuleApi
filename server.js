@@ -109,7 +109,7 @@ app.post("/Clientdata", (req, res, next) => {
             ClientName: req.body.clientName,  // user.clientName 
             email: req.body.clientEmail,  // user.clientEmail 
             Amount: req.body.clientAmount,  // user.clientAmount 
-            Status: "false"  // user.clientAmount 
+            status: "false"  // user.clientAmount 
         })
         newUser.save().then((data) => {
             res.send(data)
