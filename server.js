@@ -229,7 +229,7 @@ app.post('/ReciveOtpstep-2', (req, res, next) => {
                             if (otpData.otpCode === req.body.otp && diff < 300000) { // correct otp code
                                 otpData.remove()
 
-                                order.updateOne({ status: req.body.status, status: "true" },
+                                order.updateOne({ status: req.body.status, status: "accepted_Ture" },
                                     (err, updatestatus) => {
                                         if (updatestatus) {
 
