@@ -108,7 +108,8 @@ app.post("/Clientdata", (req, res, next) => {
             ClientId: req.body.clientID,  // user.clientID 
             ClientName: req.body.clientName,  // user.clientName 
             email: req.body.clientEmail,  // user.clientEmail 
-            Amount: req.body.clientAmount  // user.clientAmount 
+            Amount: req.body.clientAmount,  // user.clientAmount 
+            Status: "false"  // user.clientAmount 
         })
         newUser.save().then((data) => {
             res.send(data)
@@ -132,51 +133,51 @@ app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu 
             "email": "Razamalik468@gmail.com"
         }`)
         return;
-    }
-    order.findOne({ clientID: req.body.clientID },
+    }else {
+     
+        order.updateOne({ imageUrl: req.body.imageUrl })
+     
+        order.findOne({ clientID: req.body.clientID },
+            function (err, user) {
+                if (err) {
+
+                    res.status(500).send({
+                        message: "an error occured: " + JSON.stringify(err)
+                    });
+                } else if (user) {
 
 
-        function (err, user) {
-            if (err) {
 
-                res.status(500).send({
-                    message: "an error occured: " + JSON.stringify(err)
-                });
-            } else if (user) {
-
-                var userupdate = order.updateOne({ imageUrl: req.body.imageUrl })
-
-                const otp = Math.floor(getRandomArbitrary(11111, 99999))
-                otpModel.create({
-                    email: user.email,  // User Email
-                    otpCode: otp
-                }).then((doc) => {
-                    client.sendEmail({
-                        "From": "faiz_student@sysborg.com",
-                        "To": user.email,
-                        "Subject": "Reset your password",
-                        "TextBody": `Here is your pasword reset code: ${otp}`
-                    })
-                }).then((status) => {
-                    console.log("status: ", status);
-                    res.send
-                        ({
-                            status: status,
-                            message: "email sent with otp",
+                    const otp = Math.floor(getRandomArbitrary(11111, 99999))
+                    otpModel.create({
+                        email: user.email,  // User Email
+                        otpCode: otp
+                    }).then((doc) => {
+                        client.sendEmail({
+                            "From": "faiz_student@sysborg.com",
+                            "To": user.email,
+                            "Subject": "Reset your password",
+                            "TextBody": `Here is your pasword reset code: ${otp}`
                         })
-                }).catch((err) => {
-                    console.log("error in creating otp: ", err);
-                    res.status(500).send("unexpected error ")
-                })
+                    }).then((status) => {
+                        console.log("status: ", status);
+                        res.send
+                            ({
+                                message: "email sent with otp",
+                            })
+                    }).catch((err) => {
+                        console.log("error in creating otp: ", err);
+                        res.status(500).send("unexpected error ")
+                    })
 
 
-            } else {
-                res.status(403).send({
-                    message: "user not found"
-                });
-            }
-        })
-
+                } else {
+                    res.status(403).send({
+                        message: "user not found"
+                    });
+                }
+            })
+    }
 })
 
 

@@ -71,12 +71,8 @@ var orderSchema = mongoose.Schema({
     Amount: String,
     imageUrl: String,
     orderId: String,
-    // orderscart: Array,
-    // phonenumber: String,
-    // address: String,
-    // remarks: String,
     status: String,
-    "createdOn": { "type": Date, "default": Date.now },
+    "createdOn": { "type": Date, "default": Date.now }
 })
 
 var order = mongoose.model("order", orderSchema);
