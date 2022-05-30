@@ -87,7 +87,7 @@ app.post("/upload", upload.any(), (req, res, next) => {  // never use upload.sin
 
 app.post("/Clientdata", (req, res, next) => {
 
-    if (!req.body.clientID
+    if (!req.body.ClientId
         || !req.body.clientName
         || !req.body.clientEmail
         || !req.body.clientAmount
@@ -105,7 +105,7 @@ app.post("/Clientdata", (req, res, next) => {
         return;
     } else {
         const newUser = new order({
-            ClientId: req.body.clientID,  // user.clientID 
+            ClientId: req.body.ClientId,  // user.clientID 
             ClientName: req.body.clientName,  // user.clientName 
             email: req.body.clientEmail,  // user.clientEmail 
             Amount: req.body.clientAmount,  // user.clientAmount 
@@ -125,7 +125,7 @@ app.post("/Clientdata", (req, res, next) => {
 
 app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu gai otp
 
-    if (!req.body.clientID) {  //!req.body.imageUrl
+    if (!req.body.ClientId) {  //!req.body.imageUrl
         res.status(403).send(`
         please send email in json body.
         e.g:
@@ -136,7 +136,7 @@ app.post('/sendOtp', upload.any(), (req, res, next) => { // order id pa send hu 
     } else {
 
 
-        order.findOne({ clientID: req.body.clientID },
+        order.findOne({ ClientId: req.body.ClientId },
             function (err, user) {
                 if (err) {
 
@@ -185,9 +185,12 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-app.post('/ReciveOtpstep-2', (req, res, next) => {
-    if (!req.body.clientID // order id required 
+app.post('/ReciveOtpStep-2', (req, res, next) => {
+
+    console.log(req.body.clientID);
+    if (!req.body.ClientId // order id required 
         || !req.body.otp
+        || !req.body.status
 
     ) {
         res.status(403).send(`
@@ -200,67 +203,59 @@ app.post('/ReciveOtpstep-2', (req, res, next) => {
             }`)
         return;
     }
-    order.findOne({ clientID: req.body.clientID },
-        function (err, user) {
+    otpModel.find({ email: req.body.email },
+        function (err, otpData) {
+
             if (err) {
                 res.status(500).send({
                     message: "an error occured: " + JSON.stringify(err)
                 });
-            } else if (user) {
 
-                otpModel.find({ email: req.body.email },
-                    function (err, otpData) {
+            } else if (otpData) {
 
-                        if (err) {
-                            res.status(500).send({
-                                message: "an error occured: " + JSON.stringify(err)
-                            });
-                        } else if (otpData) {
-                            otpData = otpData[otpData.length - 1]
+                otpData = otpData[otpData.length - 1]
+                // console.log("otpData: ", otpData);
 
-                            console.log("otpData: ", otpData);
+                const now = new Date().getTime();
+                const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
+                const diff = now - otpIat; // 300000 5 minute
 
-                            const now = new Date().getTime();
-                            const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
-                            const diff = now - otpIat; // 300000 5 minute
+                // console.log("diff: ", diff);
 
-                            console.log("diff: ", diff);
+                if (otpData.otpCode === req.body.otp && diff < 300000) { // correct otp code
+                    otpData.remove()
 
-                            if (otpData.otpCode === req.body.otp && diff < 300000) { // correct otp code
-                                otpData.remove()
-
-                                order.updateOne({ status:  "acceptedTrue" },
-                                // order.updateOne({ status: req.body.status, status: "acceptedTrue" },
-                                    (err, updatestatus) => {
-                                        if (updatestatus) {
-
-                                            res.send({
-                                                status: "Status Update",
-                                                // status: 200
-                                            })
-                                        }
-                                    })
-
-                                console.log("update");
-
+                    order.findOne({ ClientId: req.body.ClientId },
+                        (err, user) => {
+                            if (err) {
+                                res.send(err)
+                                console.log(err);
                             } else {
-                                res.status(401).send({
-                                    message: "incorrect otp"
-                                });
+                                user.update({ status: req.body.status }, (err, data) => {
+                                res.send({
+                                    ClientId:user.ClientId,
+                                    ClientName:user.ClientName,
+                                    ClientEmail:user.email,
+                                    Status:"Updated"
+                                })
+                                })
                             }
-                        } else {
-                            res.status(401).send({
-                                message: "incorrect otp"
-                            });
-                        }
-                    })
+                        });
 
+                    console.log("update");
+
+                } else {
+                    res.status(401).send({
+                        message: "incorrect otp"
+                    });
+                }
             } else {
-                res.status(403).send({
-                    message: "user not found"
+                res.status(401).send({
+                    message: "incorrect otp"
                 });
             }
-        });
+        })
+
 })
 
 
