@@ -187,7 +187,7 @@ function getRandomArbitrary(min, max) {
 
 app.post('/ReciveOtpStep-2', (req, res, next) => {
 
-    console.log(req.body.clientID);
+    
     if (!req.body.ClientId // order id required 
         || !req.body.otp
         || !req.body.status

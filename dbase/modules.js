@@ -39,6 +39,7 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
 // =======================export
 var otpSchema = new mongoose.Schema({
     "orderId": String,
+    "ClientId": String,
     "otpCode": String,
     "createdOn": { "type": Date, "default": Date.now },
 });
