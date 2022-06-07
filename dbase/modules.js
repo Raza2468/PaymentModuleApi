@@ -36,7 +36,7 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
 
 
 
-// =======================export
+// otpSchema Start
 var otpSchema = new mongoose.Schema({
     "orderId": String,
     "ClientId": String,
@@ -45,44 +45,43 @@ var otpSchema = new mongoose.Schema({
 });
 var otpModel = mongoose.model("otps", otpSchema);
 
-// =======================export
-
-// productname: productname.current.value,
-// price: price.current.value,
-// stock: stock.current.value,
-// description: description.current.value,
-// imgUrl: img.current.value,
+// otpSchema End
 
 
-var picSchema = new mongoose.Schema({
-    // name: String,
-    email: String,
-    profileUrl: String,
-    createdOn: { type: Date, 'default': Date.now },
-    // activeSince: Date,
-
-});
-var profilepic = mongoose.model("pic", picSchema);
-// ======================>
-
-var orderSchema = mongoose.Schema({
-    ClientId: String,
-    ClientName: String,
-    email: String,
-    Amount: String,
+//  PaymentSchema Start
+var paymentSchema = mongoose.Schema({
+    PaymentId: String,
+    PaymentName: String,
+    PaymentEmail: String,
+    PaymentAmount: String,
     imageUrl: String,
-    orderId: String,
     status: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var order = mongoose.model("order", orderSchema);
+var payment = mongoose.model("payment", paymentSchema);
 
-// =======================export
+//  PaymentSchema End
 
+
+
+// Client Data Start
+var clientSchema = mongoose.Schema({
+    ClientId: String,
+    ClientName: String,
+    ClientPhoneNumber: String,
+    ClientAmount: String,
+    status: String,
+    "createdOn": { "type": Date, "default": Date.now }
+})
+
+var clientdata = mongoose.model("client", clientSchema);
+
+// Client Data End
 
 module.exports = {
+
     otpModel: otpModel,
-    profilepic: profilepic,
-    order: order,
+    payment: payment,
+    clientdata: clientdata
 }
