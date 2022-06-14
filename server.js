@@ -146,7 +146,7 @@ app.post('/PaymentSendOtp', upload.any(), (req, res, next) => {
                         PaymentAmount: req.body.PaymentAmount,
                     }
 
-                    user.updateOne(PaymentDataUpdate, (err, doc) => {
+                    user.update(PaymentDataUpdate, (err, doc) => {
                         if (!err) {
 
                             const otp = Math.floor(getRandomArbitrary(11111, 99999))
