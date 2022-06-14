@@ -83,24 +83,26 @@ app.post("/PaymentData", (req, res, next) => {
     if (!req.body.PaymentId
         || !req.body.PaymentName
         || !req.body.PaymentEmail
-        || !req.body.PaymentAmount
     ) {
         res.status(409).send(`
                     Please send PaymentName  in json body
                     e.g:
                     "PaymentId":"PaymentId",
                     "PaymentName": "PaymentName",
-                    "PaymentEmail": "PaymentEmail",
-                    "PaymentAmount": "PaymentAmount"
+                    "PaymentEmail": "PaymentEmail"
                 `)
         return;
     } else {
+
         const newUser = new payment({
             PaymentId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
-            PaymentAmount: req.body.PaymentAmount,  // user.clientAmount 
-            status: "false"  // user.clientAmount 
+            heldby: req.body.heldby,
+            dueOn: req.body.dueOn,
+            drawOn: req.body.drawOn,
+            paymentMode: req.body.paymentMode,
+            status: "false"
         })
         newUser.save().then((data) => {
             res.send(data)
@@ -116,7 +118,7 @@ app.post("/PaymentData", (req, res, next) => {
 
 // Otp Send Api
 
-app.post('/PaymentSendOtp', upload.any(), (req, res, next) => { // order id pa send hu gai otp
+app.post('/PaymentSendOtp', upload.any(), (req, res, next) => {
 
 
     if (!req.body.PaymentId) {  //!req.body.imageUrl
@@ -138,7 +140,13 @@ app.post('/PaymentSendOtp', upload.any(), (req, res, next) => { // order id pa s
                     });
                 } else if (user) {
                     // res.send(user)
-                    user.updateOne({ imageUrl: req.body.imageUrl }, (err, doc) => {
+
+                    const PaymentDataUpdate = {
+                        imageUrl: req.body.imageUrl,
+                        PaymentAmount: req.body.PaymentAmount,
+                    }
+
+                    user.updateOne(PaymentDataUpdate, (err, doc) => {
                         if (!err) {
 
                             const otp = Math.floor(getRandomArbitrary(11111, 99999))

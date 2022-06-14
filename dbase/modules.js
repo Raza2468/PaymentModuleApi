@@ -55,6 +55,10 @@ var paymentSchema = mongoose.Schema({
     PaymentEmail: String,
     PaymentAmount: String,
     imageUrl: String,
+    heldby: String,
+    dueOn: String,
+    drawOn: String,
+    paymentMode: String,
     status: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
