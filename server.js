@@ -95,7 +95,7 @@ app.post("/PaymentData", (req, res, next) => {
             PaymentId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
-            PaymentNumber: req.body.heldby,
+            PaymentNumber: req.body.PaymentNumber,
             PaymentAmount: req.body.PaymentAmount,
             imageUrl: req.body.imageUrl,
             status: "false"
