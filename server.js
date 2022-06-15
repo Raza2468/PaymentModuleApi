@@ -80,10 +80,7 @@ app.post("/upload", upload.any(), (req, res, next) => {
 
 app.post("/PaymentData", (req, res, next) => {
 
-    if (!req.body.PaymentId
-        || !req.body.PaymentName
-        || !req.body.PaymentEmail
-    ) {
+    if (!req.body.PaymentId) {
         res.status(409).send(`
                     Please send PaymentName  in json body
                     e.g:
@@ -98,14 +95,34 @@ app.post("/PaymentData", (req, res, next) => {
             PaymentId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
-            heldby: req.body.heldby,
-            dueOn: req.body.dueOn,
-            drawOn: req.body.drawOn,
-            paymentMode: req.body.paymentMode,
+            PaymentNumber: req.body.heldby,
+            PaymentAmount: req.body.PaymentAmount,
+            imageUrl: req.body.imageUrl,
             status: "false"
         })
         newUser.save().then((data) => {
-            res.send(data)
+            // res.send(data)
+            const otp = Math.floor(getRandomArbitrary(11111, 99999))
+            otpModel.create({
+                PaymentEmail: req.body.PaymentEmail,  // User Email
+                otpCode: otp
+            }).then((doc) => {
+                client.sendEmail({
+                    "From": "faiz_student@sysborg.com",
+                    "To":  req.body.PaymentEmail,
+                    "Subject": "Reset your password",
+                    "TextBody": `Here is your pasword reset code: ${otp}`
+                })
+            }).then((status) => {
+                console.log("status: ", status);
+                res.send
+                    ({
+                        message: "email sent with otp",
+                    })
+            }).catch((err) => {
+                console.log("error in creating otp: ", err);
+                res.status(500).send("unexpected error ")
+            })
 
         }).catch((err) => {
             res.status(500).send({
@@ -118,70 +135,7 @@ app.post("/PaymentData", (req, res, next) => {
 
 // Otp Send Api
 
-app.post('/PaymentSendOtp', upload.any(), (req, res, next) => {
 
-
-    if (!req.body.PaymentId) {  //!req.body.imageUrl
-        res.status(403).send(`
-        please send email in json body.
-        e.g:
-        {
-            "email": "Razamalik468@gmail.com"
-        }`)
-        return;
-    } else {
-
-        payment.findOne({ PaymentId: req.body.PaymentId },
-            function (err, user) {
-                if (err) {
-
-                    res.status(500).send({
-                        message: "an error occured: " + JSON.stringify(err)
-                    });
-                } else if (user) {
-                    // res.send(user)
-
-                    const PaymentDataUpdate = {
-                        imageUrl: req.body.imageUrl,
-                        PaymentAmount: req.body.PaymentAmount,
-                    }
-
-                    user.update(PaymentDataUpdate, (err, doc) => {
-                        if (!err) {
-
-                            const otp = Math.floor(getRandomArbitrary(11111, 99999))
-                            otpModel.create({
-                                PaymentEmail: user.PaymentEmail,  // User Email
-                                otpCode: otp
-                            }).then((doc) => {
-                                client.sendEmail({
-                                    "From": "faiz_student@sysborg.com",
-                                    "To": user.PaymentEmail,
-                                    "Subject": "Reset your password",
-                                    "TextBody": `Here is your pasword reset code: ${otp}`
-                                })
-                            }).then((status) => {
-                                console.log("status: ", status);
-                                res.send
-                                    ({
-                                        message: "email sent with otp",
-                                    })
-                            }).catch((err) => {
-                                console.log("error in creating otp: ", err);
-                                res.status(500).send("unexpected error ")
-                            })
-                        } else {
-                            res.status(500).send("ImageUrl error: ", err)
-                        }
-                    })
-                } else {
-                    res.status(403).send({
-                        message: "user not found"
-                    });
-                }
-            })
-    }
-})
 
 
 //  Rendom 5 number Otp
@@ -301,8 +255,7 @@ app.post("/ClientData", (req, res, next) => {
             ClientName: req.body.ClientName,
             ClientPhoneNumber: req.body.ClientPhoneNumber,
             ClientAmount: req.body.ClientAmount,
-            ClientEmail: req.body.ClientEmail,
-            status: "false"
+            ClientEmail: req.body.ClientEmail
         })
         newUser.save().then((data) => {
             res.send(data)
