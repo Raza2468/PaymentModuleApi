@@ -283,10 +283,7 @@ app.get('/', (req, res, next) => {
 
 app.post("/ClientData", (req, res, next) => {
 
-    if (!req.body.ClientId
-        || !req.body.ClientName
-        || !req.body.ClientPhoneNumber
-        || !req.body.ClientAmount
+    if (!req.body.ClientId || !req.body.ClientName
     ) {
         res.status(409).send(`
                     Please send PaymentName  in json body
@@ -295,6 +292,7 @@ app.post("/ClientData", (req, res, next) => {
                     "ClientName": "ClientName",
                     "ClientPhoneNumber": "ClientPhoneNumber",
                     "ClientAmount": "ClientAmount"
+                    "ClientEmail": "ClientEmail"
                 `)
         return;
     } else {
@@ -303,6 +301,7 @@ app.post("/ClientData", (req, res, next) => {
             ClientName: req.body.ClientName,
             ClientPhoneNumber: req.body.ClientPhoneNumber,
             ClientAmount: req.body.ClientAmount,
+            ClientEmail: req.body.ClientEmail,
             status: "false"
         })
         newUser.save().then((data) => {
