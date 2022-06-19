@@ -78,11 +78,23 @@ var clientSchema = mongoose.Schema({
 
 var clientdata = mongoose.model("client", clientSchema);
 
+
+var employSchema = mongoose.Schema({
+    employeeName: String,
+    employeeEmail: String,
+    employeePassword: String,
+    Role: String,
+    "createdOn": { "type": Date, "default": Date.now }
+})
+
+var employee = mongoose.model("employe", employSchema);
+
 // Client Data End
 
 module.exports = {
 
     otpModel: otpModel,
     payment: payment,
-    clientdata: clientdata
+    clientdata: clientdata,
+    employee: employee
 }

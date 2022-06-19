@@ -6,7 +6,7 @@ const multer = require("multer");
 const morgan = require("morgan");
 const postmark = require("postmark");
 const app = express()
-
+var authRoutes = require("./auth");
 
 
 const { ServerSecretKey, PORT } = require("./core/index")
@@ -25,7 +25,7 @@ app.use(cors({
 app.use(express.json())
 app.use(morgan('short'))
 
-
+app.use("/auth", authRoutes)
 
 
 const storage = multer.diskStorage({
