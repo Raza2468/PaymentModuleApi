@@ -73,6 +73,7 @@ var clientSchema = mongoose.Schema({
     ClientPhoneNumber: String,
     ClientAmount: String,
     ClientEmail: String,
+    ClientRider: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
 

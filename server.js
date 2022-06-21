@@ -91,7 +91,7 @@ app.post("/PaymentData", (req, res, next) => {
         return;
     } else {
 
-        const newUser = new payment({
+        const newPayment = new payment({
             PaymentId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
@@ -100,7 +100,7 @@ app.post("/PaymentData", (req, res, next) => {
             imageUrl: req.body.imageUrl,
             status: "false"
         })
-        newUser.save().then((data) => {
+        newPayment.save().then((data) => {
             // res.send(data)
             const otp = Math.floor(getRandomArbitrary(11111, 99999))
             otpModel.create({
@@ -109,9 +109,9 @@ app.post("/PaymentData", (req, res, next) => {
             }).then((doc) => {
                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",
-                    "To":  req.body.PaymentEmail,
-                    "Subject": "Reset your password",
-                    "TextBody": `Here is your pasword reset code: ${otp}`
+                    "To": req.body.PaymentEmail,
+                    "Subject": "Payment verify OTP",
+                    "TextBody": `Here is verify Otp code: ${otp}`
                 })
             }).then((status) => {
                 console.log("status: ", status);
@@ -135,9 +135,6 @@ app.post("/PaymentData", (req, res, next) => {
 
 // Otp Send Api
 
-
-
-
 //  Rendom 5 number Otp
 
 function getRandomArbitrary(min, max) {
@@ -159,7 +156,7 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
             please send email & otp in json body.
             e.g:
             {
-                "email": "malikasinger@gmail.com",
+                "email": "faizeraza2468@gmail.com",
                 "PaymentId": "xxxxxx",
                 "otp": "xxxxx" 
             }`)
@@ -250,14 +247,15 @@ app.post("/ClientData", (req, res, next) => {
                 `)
         return;
     } else {
-        const newUser = new clientdata({
+        const newClient = new clientdata({
             ClientId: req.body.ClientId,
             ClientName: req.body.ClientName,
             ClientPhoneNumber: req.body.ClientPhoneNumber,
             ClientAmount: req.body.ClientAmount,
-            ClientEmail: req.body.ClientEmail
+            ClientEmail: req.body.ClientEmail,
+            ClientRider: "Select Rider"
         })
-        newUser.save().then((data) => {
+        newClient.save().then((data) => {
             res.send(data)
 
         }).catch((err) => {
@@ -285,6 +283,30 @@ app.get('/ClientData', (req, res, next) => {
 })
 
 
+app.post('/ClientDataUpdate', (req, res, next) => {
+    // console.log(req.body.id);
+    // console.log(req.body.ClientRider);
+    clientdata.findById({ _id: req.body.id },
+        (err, data) => {
+            if (!err) {
+                data.update({ ClientRider: req.body.ClientRider },
+                    (err, updatestatus) => {
+                        if (updatestatus) {
+                            res.send({
+                                data: data,
+                                message: "Aysne Rider Successfully!",
+                                // status: 200
+                            })
+
+                        } else {
+                            res.send(err, "ERROR")
+                        }
+                    })
+            } else {
+                res.send({ status: 404 })
+            }
+        })
+})
 
 
 app.listen(PORT, () => {
