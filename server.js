@@ -117,6 +117,7 @@ app.post("/PaymentData", (req, res, next) => {
                 console.log("status: ", status);
                 res.send
                     ({
+                        doc,
                         message: "email sent with otp",
                     })
             }).catch((err) => {
