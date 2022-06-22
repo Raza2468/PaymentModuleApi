@@ -102,7 +102,7 @@ app.post("/PaymentData", (req, res, next) => {
         })
         newPayment.save().then((data) => {
             // res.send(data)
-            const otp = Math.floor(getRandomArbitrary(11111, 99999))
+            const otp = Math.floor(getRandomArbitrary(1111, 9999))
             otpModel.create({
                 PaymentEmail: req.body.PaymentEmail,  // User Email
                 otpCode: otp
@@ -181,8 +181,8 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
                 const diff = now - otpIat; // 300000 5 minute
 
 
-                if (otpData.otpCode === req.body.otp && diff < 300000) {
-                    otpData.remove()
+                if (otpData.otpCode === req.body.otp) {//&& diff < 300000
+                    // otpData.remove()
 
                     payment.findOne({ PaymentId: req.body.PaymentId },
                         (err, user) => {
