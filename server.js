@@ -150,9 +150,7 @@ function getRandomArbitrary(min, max) {
 app.post('/ReciveOtpStep-2', (req, res, next) => {
 
 
-    if (!req.body.PaymentId // order id required 
-        || !req.body.otp
-        || !req.body.status
+    if (!req.body.PaymentId || !req.body.otp || !req.body.status
 
     ) {
         res.status(403).send(`
