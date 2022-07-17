@@ -56,6 +56,10 @@ var paymentSchema = mongoose.Schema({
     PaymentNumber: String,
     PaymentAmount: String,
     imageUrl: String,
+    PaymentMode: String,
+    heldby: String,
+    drawOn: String,
+    dueOn: String,
     status: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
@@ -74,7 +78,7 @@ var clientSchema = mongoose.Schema({
     ClientAmount: String,
     ClientEmail: String,
     ClientRider: String,
-    CashierName:String,
+    CashierName: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
 

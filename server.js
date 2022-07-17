@@ -97,7 +97,11 @@ app.post("/PaymentData", (req, res, next) => {
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
             PaymentNumber: req.body.PaymentNumber,
             PaymentAmount: req.body.PaymentAmount,
+            PaymentMode: req.body.PaymentMode,
             imageUrl: req.body.imageUrl,
+            heldby: req.body.heldby,
+            drawOn: req.body.drawOn,
+            dueOn: req.body.dueOn,
             status: "false"
         })
         newPayment.save().then((data) => {
