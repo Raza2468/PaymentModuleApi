@@ -287,26 +287,48 @@ app.get('/ClientData', (req, res, next) => {
 app.post('/ClientDataUpdate', (req, res, next) => {
     // console.log(req.body.id);
     // console.log(req.body.ClientRider);
-    clientdata.findById({ _id: req.body.id },
+
+    let updateObj = {}
+
+    if (req.body.ClientRider) {
+        updateObj.ClientRider = req.body.ClientRider
+    }
+    if (req.body.CashierName) {
+        updateObj.CashierName = req.body.CashierName
+    }
+    clientdata.findByIdAndUpdate(req.body.id, updateObj, { new: true },
         (err, data) => {
             if (!err) {
-                data.update({ ClientRider: req.body.ClientRider },
-                    (err, updatestatus) => {
-                        if (updatestatus) {
-                            res.send({
-                                data: data,
-                                message: "Aysne Rider Successfully!",
-                                // status: 200
-                            })
-
-                        } else {
-                            res.send(err, "ERROR")
-                        }
-                    })
+                res.send({
+                    data: data,
+                    message: "Aysne Rider Successfully!",
+                    // status: 200
+                })
             } else {
-                res.send({ status: 404 })
+                res.status(500).send("error happened")
             }
         })
+
+    // clientdata.findById({ _id: req.body.id },
+    //     (err, data) => {
+    //         if (!err) {
+    //             data.update({ ClientRider: req.body.ClientRider },
+    //                 (err, updatestatus) => {
+    //                     if (updatestatus) {
+    //                         res.send({
+    //                             data: data,
+    //                             message: "Aysne Rider Successfully!",
+    //                             // status: 200
+    //                         })
+
+    //                     } else {
+    //                         res.send(err, "ERROR")
+    //                     }
+    //                 })
+    //         } else {
+    //             res.send({ status: 404 })
+    //         }
+    //     })
 })
 
 

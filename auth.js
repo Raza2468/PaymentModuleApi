@@ -46,7 +46,6 @@ app.post('/employe', (req, res, next) => {
                     employeeName: req.body.name,
                     employeeEmail: req.body.email,
                     employeePassword: req.body.password,
-                    // Role: "Awaiting"
                     Role: req.body.Role
                 })
                 employ.save((err, doc) => {
