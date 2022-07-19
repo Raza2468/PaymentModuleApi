@@ -217,6 +217,32 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
 })
 
 
+//  ReSend OTP
+
+app.post("/ReSendOTP", (req, res) => {
+    if (!req.body.PaymentEmail) {
+
+        res.send("email")
+    } else {
+        otpModel.find({ PaymentEmail: req.body.PaymentEmail },
+            function (err, otpData) {
+                if (!err) {
+                    client.sendEmail({
+                        "From": "faiz_student@sysborg.com",
+                        "To": req.body.PaymentEmail,
+                        "Subject": "Resend Payment verify OTP",
+                        "TextBody": `Here is verify Otp code: ${otpData = otpData[otpData.length - 1].otpCode.toString()}`
+                    })
+                    res.send("Please Check the email")
+                } else {
+                    res.send(err)
+
+                }
+            })
+    }
+
+})
+
 // Get all Data Payment Api
 
 app.get('/', (req, res, next) => {
