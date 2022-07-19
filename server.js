@@ -121,6 +121,7 @@ app.post("/PaymentData", (req, res, next) => {
                 console.log("status: ", status);
                 res.send
                     ({
+                        data,
                         PaymentId: req.body.PaymentId,
                         PaymentName: req.body.PaymentName,
                         PaymentAmount: req.body.PaymentAmount,
@@ -305,7 +306,7 @@ app.post('/ClientDataUpdate', (req, res, next) => {
             if (!err) {
                 res.send({
                     data: data,
-                    message: "Aysne Rider Successfully!",
+                    message: "Assign Rider Successfully!",
                     // status: 200
                 })
             } else {
@@ -321,7 +322,7 @@ app.post('/ClientDataUpdate', (req, res, next) => {
     //                     if (updatestatus) {
     //                         res.send({
     //                             data: data,
-    //                             message: "Aysne Rider Successfully!",
+    //                             message: "Assign Rider Successfully!",
     //                             // status: 200
     //                         })
 
