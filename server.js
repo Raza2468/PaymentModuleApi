@@ -188,7 +188,7 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
                 if (otpData.otpCode === req.body.otp) {//&& diff < 300000
                     // otpData.remove()
 
-                    payment.findOne({ PaymentId: req.body.PaymentId },
+                    payment.findOne({ _id: req.body.PayObjectId },
                         (err, user) => {
                             if (err) {
 
