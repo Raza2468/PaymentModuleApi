@@ -258,7 +258,7 @@ app.get('/', (req, res, next) => {
     })
 })
 
-app.get('/heldBy', (req, res, next) => {
+app.post('/heldBy', (req, res, next) => {
     payment.find({ heldby: req.body.heldby }, (err, data) => {
         if (!err) {
             res.send(data);
