@@ -1,5 +1,5 @@
 const express = require("express");
-const { employee } = require("./dbase/modules");
+const { employee, payment } = require("./dbase/modules");
 
 
 var app = express.Router()
@@ -24,8 +24,8 @@ app.post('/login', (req, res, next) => {
                 if (req.body.password === doc.employeePassword) {
 
                     res.send(doc);
-                } 
-                
+                }
+
             } else {
                 res.status(403).send({
                     message: "Empolyee not found"
@@ -188,6 +188,36 @@ app.get('/RiderEmploye', (req, res, next) => {
     })
 })
 
+app.post('/paymenTrasfer/:id', (req, res, next) => {
+
+    // console.log(req.params.id, "dd");
+    // console.log(req.body.id,"dddddddd");
+
+    payment.findById(req.params.id, (err, data) => {
+        if (!err) {
+
+            data.updateOne({ heldby: req.body.heldby },
+
+                (UpdateData, UpdateError) => {
+                    if (UpdateData) {
+                        res.send({
+                            message: "Payment Trasfare has been successfully!",
+                            data,
+                            status: 200
+                        })
+
+                    } else {
+                        res.send(UpdateError)
+                    }
+                })
+        } else {
+            res.status(409).send({
+                message: "PaymenTrasfer Error",
+                err
+            })
+        }
+    })
+})
 
 
 
