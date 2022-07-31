@@ -98,10 +98,25 @@ var employee = mongoose.model("employe", employSchema);
 
 // Client Data End
 
+
+
+var TrasationSchema = mongoose.Schema({
+    Nature: String,
+    Instrument: String,
+    PaymentID: String,
+    PaymentAmount: String,
+    From: String,
+    to: String,
+    "createdOn": { "type": Date, "default": Date.now }
+})
+
+var Trasation = mongoose.model('Trasation', TrasationSchema)
+
 module.exports = {
 
     otpModel: otpModel,
     payment: payment,
     clientdata: clientdata,
-    employee: employee
+    employee: employee,
+    Trasation: Trasation
 }

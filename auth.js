@@ -1,5 +1,5 @@
 const express = require("express");
-const { employee, payment } = require("./dbase/modules");
+const { employee, payment, Trasation } = require("./dbase/modules");
 
 
 var app = express.Router()
@@ -219,7 +219,44 @@ app.post('/paymenTrasfer/:id', (req, res, next) => {
     })
 })
 
+app.post('/trasation', (req, res, next) => {
+    if (!req.body.nature) {
+        res.status(409).send(`
+        Please send nature in json body
+        e.g:
+        "nature":"Recive && Transfer",
+    `)
+    } else {
+        const newtrasation = new Trasation({
+            Nature: req.body.nature,
+            Instrument: req.body.Instrument,
+            PaymentID: req.body.PaymentID,
+            PaymentAmount: req.body.PaymentAmount,
+            From: req.body.From,
+            to: req.body.to,
+        })
+        newtrasation.save().then((data) => {
+            res.send(data)
 
+        }).catch((err) => {
+            res.status(500).send({
+                message: "an error occured : " + err,
+            })
+        });
+    }
+})
+
+app.get('/trasation', (req, res, next) => {
+    Trasation.find({}, (err, data) => {
+        if (!err) {
+
+            res.send(data);
+        }
+        else {
+            res.status(500).send("error");
+        }
+    })
+})
 
 // =======================export
 module.exports = app
