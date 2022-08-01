@@ -203,6 +203,7 @@ app.post('/paymenTrasfer/:id', (req, res, next) => {
                         res.send({
                             message: "Payment Trasfare has been successfully!",
                             data,
+                            UpdateData,
                             status: 200
                         })
 
