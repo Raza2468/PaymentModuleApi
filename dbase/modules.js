@@ -102,9 +102,8 @@ var employee = mongoose.model("employe", employSchema);
 
 var TrasationSchema = mongoose.Schema({
     Nature: String,
-    Instrument: String,
-    PaymentID: String,
-    PaymentAmount: String,
+    Instrument: Array,
+    PaymentAmount: Array,
     From: String,
     to: String,
     "createdOn": { "type": Date, "default": Date.now }

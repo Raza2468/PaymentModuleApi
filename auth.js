@@ -230,7 +230,6 @@ app.post('/trasation', (req, res, next) => {
         const newtrasation = new Trasation({
             Nature: req.body.nature,
             Instrument: req.body.Instrument,
-            PaymentID: req.body.PaymentID,
             PaymentAmount: req.body.PaymentAmount,
             From: req.body.From,
             to: req.body.to,
