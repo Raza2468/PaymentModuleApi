@@ -249,7 +249,7 @@ app.post("/ReSendOTP", (req, res) => {
 
 app.post('/conformationPayment', (req, res, next) => {
     if (!req.body.ClinincObjectId) {
-
+        res.send("ClinincObjectId")
     } else {
         clientdata.findById({ _id: req.body.ClinincObjectId }, (err, data) => {
             if (!err) {
