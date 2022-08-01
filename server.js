@@ -246,6 +246,27 @@ app.post("/ReSendOTP", (req, res) => {
 
 })
 
+
+app.post('/conformationPayment', (req, res, next) => {
+    if (!req.body.ClinincObjectId) {
+
+    } else {
+        clientdata.findById({ _id: req.body.ClinincObjectId }, (err, data) => {
+            if (!err) {
+                client.sendEmail({
+                    "From": "faiz_student@sysborg.com",
+                    "To": data.ClientEmail,
+                    "Subject": "Thank for Payment has been Recive",
+                    "TextBody": `payment is successfully recorded in our system.`
+                })
+                res.send(data)
+            } else {
+                res.send(err)
+
+            }
+        })
+    }
+})
 // Get all Data Payment Api
 
 app.get('/', (req, res, next) => {
