@@ -197,7 +197,8 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
                                     if (!err) {
                                         res.send({
                                             message: "Stutus update",
-                                            user
+                                            user,
+                                            data
                                         })
                                     } else {
                                         console.log(err);
