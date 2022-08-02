@@ -246,12 +246,15 @@ app.post("/ReSendOTP", (req, res) => {
 
 })
 
-
+// Post conformationPayment
 app.post('/conformationPayment', (req, res, next) => {
-    if (!req.body.ClinincObjectId) {
-        res.send("ClinincObjectId")
+    
+    if (!req.body.ClientObjectId) {
+        res.send("ClientObjectId")
+
     } else {
-        clientdata.findById({ _id: req.body.ClinincObjectId }, (err, data) => {
+        clientdata.findById({ _id: req.body.ClientObjectId }, (err, data) => {
+    
             if (!err) {
                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",

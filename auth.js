@@ -1,5 +1,5 @@
 const express = require("express");
-const { employee, payment, Trasation } = require("./dbase/modules");
+const { employee, payment, Trasation, clientdata } = require("./dbase/modules");
 
 
 var app = express.Router()
@@ -257,6 +257,19 @@ app.get('/trasation', (req, res, next) => {
         }
     })
 })
+
+app.get('/ShowRiderData', (req, res, next) => {
+    clientdata.find({ ClientRider: req.body.employeeName }, (err, data) => {
+        if (!err) {
+
+            res.send(data);
+        }
+        else {
+            res.status(500).send("error");
+        }
+    })
+})
+
 
 // =======================export
 module.exports = app
