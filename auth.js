@@ -258,10 +258,11 @@ app.get('/trasation', (req, res, next) => {
     })
 })
 
-app.get('/ShowRiderData', (req, res, next) => {
+app.post('/ShowRiderData', (req, res, next) => {
+   
     clientdata.find({ ClientRider: req.body.employeeName }, (err, data) => {
+        
         if (!err) {
-
             res.send(data);
         }
         else {
