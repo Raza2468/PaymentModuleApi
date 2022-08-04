@@ -286,8 +286,45 @@ app.get('/', (req, res, next) => {
         }
     })
 })
+// collectionsby
+app.post('/collectionBy', (req, res, next) => {
+   
+    let item ={
+        name:res.heldby,
+        cheque:0,
+        cash:0,
+        count:0,
+        totalAmount:0
 
-app.get('/heldBy', (req, res, next) => {
+    }
+    payment.find({ heldby: req.body.heldby }, (err, data) => {
+        if (!err) {
+          //  res.send(data);
+            for (var i=0; i<data.length;i++){
+                item.totalAmount=item.totalAmount+parseInt(data[i].PaymentAmount);
+                item.count=data.length;
+                if(data[i].PaymentMode=="Cash"){
+                   
+                    item.cash+=data[i].PaymentAmount;
+                }else if(data[i].PaymentMode=="Cheque"){
+                   
+                    item.cheque+=parseInt(data[i].PaymentAmount);
+                }
+                else{
+                    item.others+=dparseInt(data[i].PaymentAmount); 
+                }
+console.log("Item",item);
+
+        }
+        res.send(item);
+        }
+        else {
+            res.status(500).send("error");
+        }
+    })
+})
+
+app.post('/heldBy', (req, res, next) => {
     payment.find({ heldby: req.body.heldby }, (err, data) => {
         if (!err) {
             res.send(data);
@@ -326,7 +363,9 @@ app.post('/CashierSummary', (req, res, next) => {
             payment.find({ heldby: cashiers[i].employeeName }, (err, data) => {// finding all payments held by cashier
                 if (!err) {
                     payments=data;// stores all  payments of specific cashier
-                    console.log("Payments by casier",i,payments);
+                  //  console.log("Payments by casier",cashiers[i].employeeName ,payments.length);
+                    let item= getsummaryItems(cashiers[i].employeeName,payments);
+                    collections.push(item);
                 } 
                 else {
                     res.status(500).send("errorin finding payments of a cashier");
@@ -353,7 +392,7 @@ app.post('/CashierSummary', (req, res, next) => {
                 others:0,
                 totalAmount:0,
             }
-            console.log("in Summary Item",name,payments);
+            console.log("in Summary Item",name,payments.length);
             for (var i=0; i<payments.length;i++){
                 item.totalAmount=item.totalAmount+payments[i].PaymentAmount;
                 item.count=payments.length;
