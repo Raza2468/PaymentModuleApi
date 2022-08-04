@@ -10,7 +10,7 @@ var authRoutes = require("./auth");
 
 
 const { ServerSecretKey, PORT } = require("./core/index")
-const { payment, otpModel, clientdata } = require('./dbase/modules')
+const { payment,employee, otpModel, clientdata } = require('./dbase/modules')
 const serviceAccount = require("./firebase/firebase.json");
 const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
@@ -287,7 +287,7 @@ app.get('/', (req, res, next) => {
     })
 })
 
-app.post('/heldBy', (req, res, next) => {
+app.get('/heldBy', (req, res, next) => {
     payment.find({ heldby: req.body.heldby }, (err, data) => {
         if (!err) {
             res.send(data);
@@ -298,7 +298,89 @@ app.post('/heldBy', (req, res, next) => {
     })
 })
 
+/* summary by cashier
+*/
+app.post('/CashierSummary', (req, res, next) => {
+    let collections=[];
+    var cashiers=[];
+    employee.find({ Role: "Cashier" }, (err, data) => {
+        if (!err) {
+            cashiers =data;
+            console.log("Cashiers length",cashiers.length);
+           let result= test(data);
+           res.send(result);
+        }
+    });
+    // function test(cashiers){
+    //     console.log("Cashiers lengthin test",cashiers.length);   
+    //     return"done testing";
+    // }
+    console.log("Cashiers outside",cashiers);
+} )
+         function test(cashiers){
+           console.log("Cashiers length in test",cashiers.length); 
+            let collections=[];
+        for (var i=0; i<cashiers.length;i++){
+        //    console.log("in cashier loop");
+            let payments=[];
+            payment.find({ heldby: cashiers[i].employeeName }, (err, data) => {// finding all payments held by cashier
+                if (!err) {
+                    payments=data;// stores all  payments of specific cashier
+                    console.log("Payments by casier",i,payments);
+                } 
+                else {
+                    res.status(500).send("errorin finding payments of a cashier");
+                }
+                });
+                let item= getsummaryItems(cashiers[i].employeeName,payments);
+                collections.push(item);
+                
 
+            }
+          //  console.log("Collections",collections);
+            return collections;
+        }
+           //res.send(collections);
+  
+
+    //- internal function
+        function getsummaryItems(name,payments){
+            let item={
+                employeeNamr:name,
+                cheques:0,
+                cash:0,
+                count:0,
+                others:0,
+                totalAmount:0,
+            }
+            console.log("in Summary Item",name,payments);
+            for (var i=0; i<payments.length;i++){
+                item.totalAmount=item.totalAmount+payments[i].PaymentAmount;
+                item.count=payments.length;
+                if(payments[i].PaymentMode=="Cash"){
+                   
+                    item.cash+=payments[i].PaymentAmount;
+                }else if(payments[i].PaymentMode=="Cheque"){
+                   
+                    item.cheque+=payments[i].PaymentAmount;
+                }
+                else{
+                    item.others+=payments[i].PaymentAmount; 
+                }
+
+
+        }
+        return item;
+    }
+//     payment.find({ heldby: req.body.heldby }, (err, data) => {
+//         if (!err) {
+//             res.send(data);
+//         }
+//         else {
+//             res.status(500).send("error");
+//         }
+//     })
+// })
 
 //Post All Api with ClientData 
 
