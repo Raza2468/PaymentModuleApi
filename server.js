@@ -10,13 +10,12 @@ var authRoutes = require("./auth");
 
 
 const { ServerSecretKey, PORT } = require("./core/index")
-const { payment, otpModel, clientdata } = require('./dbase/modules')
+const { payment, otpModel, clientdata, employee } = require('./dbase/modules')
 const serviceAccount = require("./firebase/firebase.json");
 const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
-// var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3");
-
-
+// Send an email:
+// var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3")
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({
@@ -249,13 +248,13 @@ app.post("/ReSendOTP", (req, res) => {
 
 // Post conformationPayment
 app.post('/conformationPayment', (req, res, next) => {
-    
+
     if (!req.body.ClientObjectId) {
         res.send("ClientObjectId")
 
     } else {
         clientdata.findById({ _id: req.body.ClientObjectId }, (err, data) => {
-    
+
             if (!err) {
                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",
@@ -287,6 +286,50 @@ app.get('/', (req, res, next) => {
     })
 })
 
+// collectionsby
+
+
+
+app.post('/collectionBy', (req, res, next) => {
+
+    let item = {
+        name: res.heldby,
+        cheque: 0,
+        cash: 0,
+        count: 0,
+        totalAmount: 0
+
+    }
+    payment.find({ heldby: req.body.heldby }, (err, data) => {
+        if (!err) {
+            //  res.send(data);
+            for (var i = 0; i < data.length; i++) {
+                item.totalAmount = item.totalAmount + parseInt(data[i].PaymentAmount);
+                item.count = data.length;
+                if (data[i].PaymentMode == "Cash") {
+
+                    item.cash += data[i].PaymentAmount;
+                } else if (data[i].PaymentMode == "Cheque") {
+
+                    item.cheque += parseInt(data[i].PaymentAmount);
+                }
+                else {
+                    item.others += dparseInt(data[i].PaymentAmount);
+                }
+                console.log("Item", item);
+
+            }
+            res.send(item);
+        }
+        else {
+            res.status(500).send("error");
+        }
+    })
+})
+
+
+
+
 app.post('/heldBy', (req, res, next) => {
     payment.find({ heldby: req.body.heldby }, (err, data) => {
         if (!err) {
@@ -299,6 +342,82 @@ app.post('/heldBy', (req, res, next) => {
 })
 
 
+
+app.post('/CashierSummary', (req, res, next) => {
+    let collections = [];
+    var cashiers = [];
+    employee.find({ Role: "Cashier" }, (err, data) => {
+        if (!err) {
+            cashiers = data;
+            console.log("Cashiers length", cashiers.length);
+            let result = test(data);
+            res.send(result);
+        }
+    });
+    // function test(cashiers){
+    //     console.log("Cashiers lengthin test",cashiers.length);   
+    //     return"done testing";
+    // }
+    console.log("Cashiers outside", cashiers);
+})
+
+function test(cashiers) {
+    console.log("Cashiers length in test", cashiers.length);
+    let collections = [];
+    for (var i = 0; i < cashiers.length; i++) {
+        //    console.log("in cashier loop");
+        let payments = [];
+        payment.find({ heldby: cashiers[i].employeeName }, (err, data) => {// finding all payments held by cashier
+            if (!err) {
+                payments = data;// stores all  payments of specific cashier
+                //  console.log("Payments by casier",cashiers[i].employeeName ,payments.length);
+                let item = getsummaryItems(cashiers[i].employeeName, payments);
+                collections.push(item);
+            }
+            else {
+                res.status(500).send("errorin finding payments of a cashier");
+            }
+        });
+        let item = getsummaryItems(cashiers[i].employeeName, payments);
+        collections.push(item);
+
+
+    }
+    //  console.log("Collections",collections);
+    return collections;
+}
+//res.send(collections);
+
+
+//- internal function
+function getsummaryItems(name, payments) {
+    let item = {
+        employeeNamr: name,
+        cheques: 0,
+        cash: 0,
+        count: 0,
+        others: 0,
+        totalAmount: 0,
+    }
+    console.log("in Summary Item", name, payments.length);
+    for (var i = 0; i < payments.length; i++) {
+        item.totalAmount = item.totalAmount + payments[i].PaymentAmount;
+        item.count = payments.length;
+        if (payments[i].PaymentMode == "Cash") {
+
+            item.cash += payments[i].PaymentAmount;
+        } else if (payments[i].PaymentMode == "Cheque") {
+
+            item.cheque += payments[i].PaymentAmount;
+        }
+        else {
+            item.others += payments[i].PaymentAmount;
+        }
+
+
+    }
+    return item;
+}
 
 //Post All Api with ClientData 
 
@@ -401,6 +520,25 @@ app.post('/ClientDataUpdate', (req, res, next) => {
     //     })
 })
 
+
+app.get('/paymentSummary', (req, res, next) => {
+    payment.find({}, (err, data) => {
+        if (!err) {
+            const unique = (value, index, self) => {
+                return self.indexOf(value) === index
+            }
+            const uniqueAges = data.filter(unique)
+
+            console.log(uniqueAges)
+            //     var a = data.filter((x, i, a) => a.indexOf(x) === i)
+            // //   const b =
+            res.send(uniqueAges.heldby)
+        }
+        else {
+            res.status(500).send(err);
+        }
+    })
+})
 
 app.listen(PORT, () => {
     console.log("start server....", `http://localhost:${PORT}`)
