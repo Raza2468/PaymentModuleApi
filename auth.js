@@ -272,7 +272,7 @@ app.post('/ShowRiderData', (req, res, next) => {
     })
 })
 
-app.get('/craetedby', (req, res, next) => {
+app.post('/craetedby', (req, res, next) => {
     if (!req.body.createdBy) {
         res.send("error")
     } else {
