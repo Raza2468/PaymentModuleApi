@@ -260,7 +260,14 @@ app.get('/transaction', (req, res, next) => {
 })
 
 app.post('/ShowRiderData', (req, res, next) => {
-
+if (!req.body.ClientRiderObjectId ) {
+    res.status(409).send(`
+    Please send ClientRiderObjectId in json body
+    e.g:
+    "ClientRiderObjectId":"ClientRiderObjectId",
+`)
+    
+} else {
     clientdata.find({ ClientRiderObjectId: req.body.ClientRiderObjectId }, (err, data) => {
 
         if (!err) {
@@ -270,6 +277,8 @@ app.post('/ShowRiderData', (req, res, next) => {
             res.status(500).send("error");
         }
     })
+}
+  
 })
 
 app.post('/craetedby', (req, res, next) => {
