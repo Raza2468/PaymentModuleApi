@@ -482,6 +482,9 @@ app.post('/ClientDataUpdate', (req, res, next) => {
     if (req.body.ClientRider) {
         updateObj.ClientRider = req.body.ClientRider
     }
+    if (req.body.ClientRiderObjectId) {
+        updateObj.ClientRiderObjectId = req.body.ClientRiderObjectId
+    }
     if (req.body.CashierName) {
         updateObj.CashierName = req.body.CashierName
     }
