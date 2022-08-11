@@ -12,10 +12,10 @@ var authRoutes = require("./auth");
 const { ServerSecretKey, PORT } = require("./core/index")
 const { payment, otpModel, clientdata, employee } = require('./dbase/modules')
 const serviceAccount = require("./firebase/firebase.json");
-const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
+// const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
 // Send an email:
-// var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3")
+var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3")
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({

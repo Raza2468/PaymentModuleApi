@@ -1,5 +1,5 @@
 const express = require("express");
-const { employee, payment, Trasation, clientdata } = require("./dbase/modules");
+const { employee, payment, Transaction, clientdata } = require("./dbase/modules");
 
 
 var app = express.Router()
@@ -46,6 +46,7 @@ app.post('/employe', (req, res, next) => {
                     employeeName: req.body.name,
                     employeeEmail: req.body.email,
                     employeePassword: req.body.password,
+                    createdBy: req.body.createdBy,
                     Role: req.body.Role
                 })
                 employ.save((err, doc) => {
@@ -220,7 +221,7 @@ app.post('/paymenTrasfer/:id', (req, res, next) => {
     })
 })
 
-app.post('/trasation', (req, res, next) => {
+app.post('/transaction', (req, res, next) => {
     if (!req.body.nature) {
         res.status(409).send(`
         Please send nature in json body
@@ -228,14 +229,14 @@ app.post('/trasation', (req, res, next) => {
         "nature":"Recive && Transfer",
     `)
     } else {
-        const newtrasation = new Trasation({
+        const newtransaction = new Transaction({
             Nature: req.body.nature,
             Instrument: req.body.Instrument,
             PaymentAmount: req.body.PaymentAmount,
             From: req.body.From,
             to: req.body.to,
         })
-        newtrasation.save().then((data) => {
+        newtransaction.save().then((data) => {
             res.send(data)
 
         }).catch((err) => {
@@ -246,8 +247,8 @@ app.post('/trasation', (req, res, next) => {
     }
 })
 
-app.get('/trasation', (req, res, next) => {
-    Trasation.find({}, (err, data) => {
+app.get('/transaction', (req, res, next) => {
+    Transaction.find({}, (err, data) => {
         if (!err) {
 
             res.send(data);
@@ -259,9 +260,9 @@ app.get('/trasation', (req, res, next) => {
 })
 
 app.post('/ShowRiderData', (req, res, next) => {
-   
+
     clientdata.find({ ClientRider: req.body.employeeName }, (err, data) => {
-        
+
         if (!err) {
             res.send(data);
         }
@@ -270,6 +271,23 @@ app.post('/ShowRiderData', (req, res, next) => {
         }
     })
 })
+
+app.get('/craetedby', (req, res, next) => {
+    if (!req.body.createdBy) {
+        res.send("error")
+    } else {
+        employee.find({ createdBy: req.body.createdBy, Role: req.body.Role }, (err, data) => {
+            if (!err) {
+                res.send(data)
+
+            } else {
+                res.send(err)
+            }
+        })
+
+    }
+})
+
 
 // 
 // =======================export

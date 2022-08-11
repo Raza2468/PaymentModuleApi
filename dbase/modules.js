@@ -90,6 +90,7 @@ var employSchema = mongoose.Schema({
     employeeName: String,
     employeeEmail: String,
     employeePassword: String,
+    createdBy: String,
     Role: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
@@ -100,7 +101,7 @@ var employee = mongoose.model("employe", employSchema);
 
 
 
-var TrasationSchema = mongoose.Schema({
+var TransactionSchema = mongoose.Schema({
     Nature: String,
     Instrument: Array,
     PaymentAmount: Array,
@@ -109,7 +110,7 @@ var TrasationSchema = mongoose.Schema({
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var Trasation = mongoose.model('Trasation', TrasationSchema)
+var Transaction = mongoose.model('Transaction', TransactionSchema)
 
 module.exports = {
 
@@ -117,5 +118,5 @@ module.exports = {
     payment: payment,
     clientdata: clientdata,
     employee: employee,
-    Trasation: Trasation
+    Transaction: Transaction
 }
