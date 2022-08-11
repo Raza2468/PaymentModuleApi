@@ -189,7 +189,7 @@ app.get('/RiderEmploye', (req, res, next) => {
     })
 })
 
-app.post('/paymenTrasfer/:id', (req, res, next) => {
+app.post('/paymentTransfer/:id', (req, res, next) => {
 
     // console.log(req.params.id, "dd");
     // console.log(req.body.id,"dddddddd");
