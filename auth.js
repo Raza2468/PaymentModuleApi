@@ -261,7 +261,7 @@ app.get('/transaction', (req, res, next) => {
 
 app.post('/ShowRiderData', (req, res, next) => {
 
-    clientdata.find({ ClientRider: req.body.ClientRiderObjectId }, (err, data) => {
+    clientdata.find({ ClientRiderObjectId: req.body.ClientRiderObjectId }, (err, data) => {
 
         if (!err) {
             res.send(data);
