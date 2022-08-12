@@ -233,7 +233,7 @@ app.post('/transaction', (req, res, next) => {
             Nature: req.body.nature,
             Instrument: req.body.Instrument,
             PaymentAmount: req.body.PaymentAmount,
-            BelongsTo : req.body.BelongsTo ,
+            BelongsTo: req.body.BelongsTo,
             From: req.body.From,
             to: req.body.to,
         })
@@ -261,25 +261,25 @@ app.get('/transaction', (req, res, next) => {
 })
 
 app.post('/ShowRiderData', (req, res, next) => {
-if (!req.body.ClientRiderObjectId ) {
-    res.status(409).send(`
+    if (!req.body.ClientRiderObjectId) {
+        res.status(409).send(`
     Please send ClientRiderObjectId in json body
     e.g:
     "ClientRiderObjectId":"ClientRiderObjectId",
 `)
-    
-} else {
-    clientdata.find({ ClientRiderObjectId: req.body.ClientRiderObjectId }, (err, data) => {
 
-        if (!err) {
-            res.send(data);
-        }
-        else {
-            res.status(500).send("error");
-        }
-    })
-}
-  
+    } else {
+        clientdata.find({ ClientRiderObjectId: req.body.ClientRiderObjectId }, (err, data) => {
+
+            if (!err) {
+                res.send(data);
+            }
+            else {
+                res.status(500).send("error");
+            }
+        })
+    }
+
 })
 
 app.post('/craetedby', (req, res, next) => {
