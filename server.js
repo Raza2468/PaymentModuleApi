@@ -17,6 +17,15 @@ const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // Send an email:
 // var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3")
 
+
+// Send an SmS:
+
+var sid = 'AC5895e1f24b9309e9d14fa9e47920bf33'
+var auth_token = '0fee8c26cde02e811aa49e1cd744ffae'
+const twilio = require("twilio")(sid, auth_token);
+
+
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({
     origin: "*",
@@ -111,11 +120,18 @@ app.post("/PaymentData", (req, res, next) => {
                 PaymentEmail: req.body.PaymentEmail,  // User Email
                 otpCode: otp
             }).then((doc) => {
-                client.sendEmail({
-                    "From": "faiz_student@sysborg.com",
-                    "To": req.body.PaymentEmail,
-                    "Subject": "Payment verify OTP",
-                    "TextBody": `Here is verify Otp code: ${otp}`
+
+                // client.sendEmail({
+                //     "From": "faiz_student@sysborg.com",
+                //     "To": req.body.PaymentEmail,
+                //     "Subject": "Payment verify OTP",
+                //     "TextBody": `Here is verify Otp code: ${otp}`
+                // })
+
+                twilio.messages.create({
+                    from: "+12135285920",
+                    to: `+92${req.body.PaymentNumber}`,
+                    body: `Here is verify Otp code: ${otp}`,
                 })
             }).then((status) => {
                 console.log("status: ", status);
@@ -543,6 +559,8 @@ app.get('/paymentSummary', (req, res, next) => {
         }
     })
 })
+
+
 
 app.listen(PORT, () => {
     console.log("start server....", `http://localhost:${PORT}`)

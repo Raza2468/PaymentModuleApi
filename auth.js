@@ -298,6 +298,20 @@ app.post('/craetedby', (req, res, next) => {
     }
 })
 
+app.post('/BelongsTo', (req, res, next) => {
+    if (!req.body.createdBy) {
+
+    } else {
+        clientdata.find({ BelongsTo: req.body.createdBy }, (err, doc) => {
+            if (!err) {
+                res.send(doc)
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
+
 
 // 
 // =======================export
