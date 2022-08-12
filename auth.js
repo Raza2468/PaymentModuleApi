@@ -233,6 +233,7 @@ app.post('/transaction', (req, res, next) => {
             Nature: req.body.nature,
             Instrument: req.body.Instrument,
             PaymentAmount: req.body.PaymentAmount,
+            BelongsTo : req.body.BelongsTo ,
             From: req.body.From,
             to: req.body.to,
         })

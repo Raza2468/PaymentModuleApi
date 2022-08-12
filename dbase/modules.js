@@ -109,6 +109,7 @@ var TransactionSchema = mongoose.Schema({
     PaymentAmount: Array,
     From: String,
     to: String,
+    BelongsTo : String,
     "createdOn": { "type": Date, "default": Date.now }
 })
 
