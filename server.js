@@ -443,7 +443,7 @@ app.post("/ClientData", (req, res, next) => {
             ClientPhoneNumber: req.body.ClientPhoneNumber,
             ClientAmount: req.body.ClientAmount,
             ClientEmail: req.body.ClientEmail,
-            BelingsTo: req.body.BelingsTo,
+            BelongsTo: req.body.BelongsTo,
             ClientRider: "Select Rider"
         })
         newClient.save().then((data) => {
