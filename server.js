@@ -121,18 +121,19 @@ app.post("/PaymentData", (req, res, next) => {
                 otpCode: otp
             }).then((doc) => {
 
-                // client.sendEmail({
-                //     "From": "faiz_student@sysborg.com",
-                //     "To": req.body.PaymentEmail,
-                //     "Subject": "Payment verify OTP",
-                //     "TextBody": `Here is verify Otp code: ${otp}`
-                // })
+                client.sendEmail({
+                    "From": "faiz_student@sysborg.com",
+                    "To": req.body.PaymentEmail,
+                    "Subject": "Payment verify OTP",
+                    "TextBody": `Here is verify Otp code: ${otp}`
+                })
 
                 twilio.messages.create({
                     from: "+12135285920",
                     to: `+92${req.body.PaymentNumber}`,
                     body: `Here is verify Otp code: ${otp}`,
                 })
+                
             }).then((status) => {
                 console.log("status: ", status);
                 res.send
