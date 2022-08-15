@@ -337,7 +337,7 @@ app.get('/TransactionBelongsTo', (req, res, next) => {
 
 
 app.post('/empolyeeClientData', (req, res, next) => {
-    if (!req.body.EmployeeObjectId || !req.body.ClientObjectId) {
+    if (!req.body.EmployeeObjectId) {
         res.status(409).send(`
         Please send EmployeeObjectId in json body
         e.g:
