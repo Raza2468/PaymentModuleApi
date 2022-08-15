@@ -300,7 +300,11 @@ app.post('/craetedby', (req, res, next) => {
 
 app.post('/BelongsTo', (req, res, next) => {
     if (!req.body.createdBy) {
-
+        res.status(409).send(`
+        Please send createdBy in json body
+        e.g:
+        "createdBy":"createdBy",
+    `)
     } else {
         clientdata.find({ BelongsTo: req.body.createdBy }, (err, doc) => {
             if (!err) {
@@ -311,6 +315,55 @@ app.post('/BelongsTo', (req, res, next) => {
         })
     }
 })
+
+
+app.get('/TransactionBelongsTo', (req, res, next) => {
+    if (!req.body.BelongsTo) {
+        res.status(409).send(`
+        Please send BelongsTo in json body
+        e.g:
+        "BelongsTo":"BelongsTo",
+    `)
+    } else {
+        Transaction.find({ BelongsTo: req.body.BelongsTo }, (err, doc) => {
+            if (!err) {
+                res.send(doc)
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
+
+
+app.post('/empolyeeClientData', (req, res, next) => {
+    if (!req.body.EmployeeObjectId || !req.body.ClientObjectId) {
+        res.status(409).send(`
+        Please send EmployeeObjectId in json body
+        e.g:
+        "EmployeeObjectId":"EmployeeObjectId",
+        "ClientObjectId":"ClientObjectId"
+    `)
+    } else {
+        employee.find({ _id: req.body.EmployeeObjectId }, (err, doc) => {
+            if (!err) {
+                clientdata.find({ _id: req.body.ClientObjectId }, (err, data) => {
+                    if (!err) {
+                        res.send({
+                            Employee: doc,
+                            Client: data
+                        })
+                    } else {
+                        res.send(err)
+                    }
+                })
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
+
 
 
 // 
