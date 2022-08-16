@@ -317,7 +317,7 @@ app.post('/BelongsTo', (req, res, next) => {
 })
 
 
-app.get('/TransactionBelongsTo', (req, res, next) => {
+app.post('/TransactionBelongsTo', (req, res, next) => {
     if (!req.body.BelongsTo) {
         res.status(409).send(`
         Please send BelongsTo in json body
