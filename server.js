@@ -172,7 +172,7 @@ function getRandomArbitrary(min, max) {
 app.post('/ReciveOtpStep-2', (req, res, next) => {
 
 
-    if (!req.body.PaymentId || !req.body.otp || !req.body.status) {
+    if (!req.body.PayObjectId || !req.body.otp || !req.body.status) {
 
         res.status(403).send(`
             please send email & otp in json body.
