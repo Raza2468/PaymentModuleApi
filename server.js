@@ -184,7 +184,7 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
             }`)
         return;
     }
-    otpModel.find({ PaymentEmail: req.body.PaymentEmail },
+    otpModel.find({ PayObjectId: req.body.PayObjectId },
         function (err, otpData) {
 
             if (err) {
