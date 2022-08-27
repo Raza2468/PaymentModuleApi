@@ -251,25 +251,25 @@ app.post("/ReSendOTP", (req, res) => {
 });
 
 // Post conformationPayment
-app.post("/conformationPayment", (req, res, next) => {
-  if (!req.body.ClientObjectId) {
-    res.send("ClientObjectId");
-  } else {
-    clientdata.findById({ _id: req.body.ClientObjectId }, (err, data) => {
-      if (!err) {
-        client.sendEmail({
-          From: "faiz_student@sysborg.com",
-          To: data.ClientEmail,
-          Subject: "Thank for Payment has been Recive",
-          TextBody: `payment is successfully recorded in our system.`,
-        });
-        res.send(data);
-      } else {
-        res.send(err);
-      }
-    });
-  }
-});
+// app.post("/conformationPayment", (req, res, next) => {
+//   if (!req.body.ClientObjectId) {
+//     res.send("ClientObjectId");
+//   } else {
+//     clientdata.findById({ _id: req.body.ClientObjectId }, (err, data) => {
+//       if (!err) {
+//         client.sendEmail({
+//           From: "faiz_student@sysborg.com",
+//           To: data.ClientEmail,
+//           Subject: "Thank for Payment has been Recive",
+//           TextBody: `payment is successfully recorded in our system.`,
+//         });
+//         res.send(data);
+//       } else {
+//         res.send(err);
+//       }
+//     });
+//   }
+// });
 // Get all Data Payment Api
 
 app.get("/", (req, res, next) => {
