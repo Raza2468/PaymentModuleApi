@@ -286,6 +286,25 @@ app.get('/', (req, res, next) => {
         }
     })
 })
+
+//API to receive filter and return filtered Payments
+app.post('/filteredPayments', (req, res, next) => {
+    if (!req.body.filter) {
+        res.status(409).send(`
+        Please send filter in json body
+        e.g:
+        "filter":"{}",
+    `)
+    } else {
+        payment.find(  req.body.filter , (err, doc) => {
+            if (!err) {
+                res.send(doc)
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
 // collectionsby
 app.post('/collectionBy', (req, res, next) => {
    
