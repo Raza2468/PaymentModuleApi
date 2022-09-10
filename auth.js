@@ -188,7 +188,27 @@ app.get('/RiderEmploye', (req, res, next) => {
         }
     })
 })
+//- bulk transfer
 
+app.post('/bulkTransfer', (req, res, next) => {
+    
+    console.log("In Bulk ransfer",req.body);
+    
+    var filters= req.body.filter;
+
+    payment.updateMany({ _id: { $in: filters } },
+        { $set: { heldby: req.body.heldby} },
+        {multi: true}, 
+        function(err, records){
+            if (err) {
+                return false;
+            }else{
+                res.send(records);
+            }
+     }
+
+      )})
+//- single transfer
 app.post('/paymentTransfer/:id', (req, res, next) => {
 
     // console.log(req.params.id, "dd");
