@@ -195,15 +195,34 @@ app.post('/bulkTransfer', (req, res, next) => {
     console.log("In Bulk ransfer",req.body);
     
     var filters= req.body.filter;
+    var transactiondata = req.body.transaction
 
     payment.updateMany({ _id: { $in: filters } },
         { $set: { heldby: req.body.heldby} },
         {multi: true}, 
         function(err, records){
             if (err) {
-                return false;
+                res.status(409).send({
+                    message: "PaymenTrasfer Error",
+                    err
+                })
             }else{
-                res.send(records);
+                const newtransaction = new Transaction({
+                    Nature: transactiondata.nature,
+                    Instrument: transactiondata.Instrument,
+                    PaymentAmount: transactiondata.PaymentAmount,
+                    BelongsTo: transactiondata.BelongsTo,
+                    From: transactiondata.From,
+                    to: transactiondata.to,
+                });
+                newtransaction.save().then((data) => {
+                    res.send(data)
+        
+                }).catch((err) => {
+                    res.status(500).send({
+                        message: "an error occured : " + err,
+                    })
+                });
             }
      }
 
