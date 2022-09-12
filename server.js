@@ -496,51 +496,39 @@ app.get('/ClientData', (req, res, next) => {
 })
 
 
-app.post('/ClientDataUpdate', (req, res, next) => {
+app.post("/ClientDataUpdate", (req, res, next) => {
     // console.log(req.body.id);
     // console.log(req.body.ClientRider);
-
-    let updateObj = {}
-
+  
+    let updateObj = {};
+  
     if (req.body.ClientRider) {
-        updateObj.ClientRider = req.body.ClientRider
+      updateObj.ClientRider = req.body.ClientRider;
+    }
+    if (req.body.ClientRiderObjectId) {
+      updateObj.ClientRiderObjectId = req.body.ClientRiderObjectId;
     }
     if (req.body.CashierName) {
-        updateObj.CashierName = req.body.CashierName
+      updateObj.CashierName = req.body.CashierName;
     }
-    clientdata.findByIdAndUpdate(req.body.id, updateObj, { new: true },
-        (err, data) => {
-            if (!err) {
-                res.send({
-                    data: data,
-                    message: "Assign Rider Successfully!",
-                    // status: 200
-                })
-            } else {
-                res.status(500).send("error happened")
-            }
-        })
+    clientdata.findByIdAndUpdate(
+      req.body.id,
+      updateObj,
+      { new: true },
+      (err, data) => {
+        if (!err) {
+          res.send({
+            data: data,
+            message: "Assign Rider Successfully!",
+            // status: 200
+          });
+        } else {
+          res.status(500).send("error happened");
+        }
+      }
+    );
 
-    // clientdata.findById({ _id: req.body.id },
-    //     (err, data) => {
-    //         if (!err) {
-    //             data.update({ ClientRider: req.body.ClientRider },
-    //                 (err, updatestatus) => {
-    //                     if (updatestatus) {
-    //                         res.send({
-    //                             data: data,
-    //                             message: "Assign Rider Successfully!",
-    //                             // status: 200
-    //                         })
-
-    //                     } else {
-    //                         res.send(err, "ERROR")
-    //                     }
-    //                 })
-    //         } else {
-    //             res.send({ status: 404 })
-    //         }
-    //     })
+   
 })
 
 
