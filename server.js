@@ -229,7 +229,7 @@ app.post("/ReSendOTP", (req, res) => {
 
         res.send("email")
     } else {
-        otpModel.find({ PaymentEmail: req.body.PaymentEmail },
+        otpModel.find({ PaymentId: req.body.PaymentId },
             function (err, otpData) {
                 if (!err) {
                     client.sendEmail({
