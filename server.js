@@ -110,6 +110,7 @@ app.post("/PaymentData", (req, res, next) => {
             const otp = Math.floor(getRandomArbitrary(1111, 9999))
             otpModel.create({
                 PaymentEmail: req.body.PaymentEmail,  // User Email
+                PaymentId:req.body.PaymentId, 
                 otpCode: otp
             }).then((doc) => {
                 client.sendEmail({
@@ -168,7 +169,7 @@ app.post('/ReciveOtpStep-2', (req, res, next) => {
             }`)
         return;
     }
-    otpModel.find({ PaymentEmail: req.body.PaymentEmail },
+    otpModel.find({ PaymentId: req.body.PaymentId },
         function (err, otpData) {
 
             if (err) {
@@ -464,7 +465,8 @@ app.post("/ClientData", (req, res, next) => {
             ClientPhoneNumber: req.body.ClientPhoneNumber,
             ClientAmount: req.body.ClientAmount,
             ClientEmail: req.body.ClientEmail,
-            ClientRider: "Select Rider"
+            ClientRider: "Select Rider",
+            BelongsTo: req.body.BelongsTo
         })
         newClient.save().then((data) => {
             res.send(data)
