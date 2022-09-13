@@ -6,16 +6,19 @@ const multer = require("multer");
 const morgan = require("morgan");
 const postmark = require("postmark");
 const app = express()
-var authRoutes = require("./auth");
+const authRoutes = require("./auth");
 
 
 const { ServerSecretKey, PORT } = require("./core/index")
-const { payment,employee, otpModel, clientdata } = require('./dbase/modules')
+const { payment, employee, otpModel, clientdata } = require('./dbase/modules')
 const serviceAccount = require("./firebase/firebase.json");
 const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
-// var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3");
+// var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3");    
 
+var http = require("http");
+var APIKey = '43de943e9d0742109e6ee6afeeae7a6f';
+var sender = '8583';
 
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -110,17 +113,55 @@ app.post("/PaymentData", (req, res, next) => {
             const otp = Math.floor(getRandomArbitrary(1111, 9999))
             otpModel.create({
                 PaymentEmail: req.body.PaymentEmail,  // User Email
-                PaymentId:req.body.PaymentId, 
+                PaymentId: req.body.PaymentId,
                 otpCode: otp
             }).then((doc) => {
+
+
+
+
+                var receiver = `92${data.PaymentNumber}`
+                console.log(receiver, "receiver");
+
+                var textmessage = `Here is verify Otp code: ${otp}`;
+
+                var options = {
+
+                    host: 'api.veevotech.com',
+                    path: "/sendsms?hash=" + APIKey + "&receivenum=" + receiver + "&sendernum=" + encodeURIComponent(sender) + "&textmessage=" + encodeURIComponent(textmessage),
+                    method: 'GET',
+                    setTimeout: 30000
+
+                };
+
+                console.log(options);
+
+                var req = http.request(options, function (res) {
+                    console.log('STATUS: ' + res.statusCode);
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        console.log(chunk.toString());
+                    });
+                });
+
+                req.on('error', function (e) {
+                    console.log('problem with request: ' + e.message);
+                });
+
+                req.end();
+
+
+
+
+
+            }).then((status) => {
+                // console.log("status: ", status);
                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",
                     "To": req.body.PaymentEmail,
                     "Subject": "Payment verify OTP",
                     "TextBody": `Here is verify Otp code: ${otp}`
                 })
-            }).then((status) => {
-                console.log("status: ", status);
                 res.send
                     ({
                         data,
@@ -146,17 +187,15 @@ app.post("/PaymentData", (req, res, next) => {
 // Otp Send Api
 
 //  Rendom 5 number Otp
-
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
 
 // Step 2 Recive Email Otp Api
-
 app.post("/ReciveOtpStep-2", (req, res, next) => {
     if (!req.body.PayObjectId || !req.body.otp || !req.body.status) {
-      res.status(403).send(`
+        res.status(403).send(`
               please send email & otp in json body.
               e.g:
               {
@@ -164,64 +203,63 @@ app.post("/ReciveOtpStep-2", (req, res, next) => {
                   "PaymentId": "xxxxxx",
                   "otp": "xxxxx" 
               }`);
-      return;
+        return;
     }
     otpModel.find({ PayObjectId: req.body.PayObjectId }, function (err, otpData) {
-      if (err) {
-        res.status(500).send({
-          message: "an error occured: " + JSON.stringify(err),
-        });
-      } else if (otpData) {
-        otpData = otpData[otpData.length - 1];
-  
-        const now = new Date().getTime();
-        const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
-        const diff = now - otpIat; // 300000 5 minute
-  
-        if (otpData.otpCode === req.body.otp) {
-          //&& diff < 300000
-          // otpData.remove()
-  
-          payment.findOne({ _id: req.body.PayObjectId }, (err, user) => {
-            if (err) {
-              res.send(err);
+        if (err) {
+            res.status(500).send({
+                message: "an error occured: " + JSON.stringify(err),
+            });
+        } else if (otpData) {
+            otpData = otpData[otpData.length - 1];
+
+            const now = new Date().getTime();
+            const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
+            const diff = now - otpIat; // 300000 5 minute
+
+            if (otpData.otpCode === req.body.otp) {
+                //&& diff < 300000
+                // otpData.remove()
+
+                payment.findOne({ _id: req.body.PayObjectId }, (err, user) => {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        user.update({ status: req.body.status }, (err, data) => {
+                            if (!err) {
+                                res.send({
+                                    message: "Stutus update",
+                                    user,
+                                    data,
+                                });
+                                console.log(user.PaymentEmail);
+                                client.sendEmail({
+                                    From: "faiz_student@sysborg.com",
+                                    To: user.PaymentEmail,
+                                    Subject: "Thank for Payment is Recived",
+                                    TextBody: `payment is successfully recorded in our system.`,
+                                });
+                            } else {
+                                console.log(err);
+                            }
+                        });
+                    }
+                });
             } else {
-              user.update({ status: req.body.status }, (err, data) => {
-                if (!err) {
-                  res.send({
-                    message: "Stutus update",
-                    user,
-                    data,
-                  });
-                  console.log(user.PaymentEmail);
-                  client.sendEmail({
-                    From: "faiz_student@sysborg.com",
-                    To: user.PaymentEmail,
-                    Subject: "Thank for Payment is Recived",
-                    TextBody: `payment is successfully recorded in our system.`,
-                  });
-                } else {
-                  console.log(err);
-                }
-              });
+                res.status(401).send({
+                    message: "incorrect otp",
+                });
             }
-          });
         } else {
-          res.status(401).send({
-            message: "incorrect otp",
-          });
+            res.status(401).send({
+                message: "incorrect otp",
+            });
         }
-      } else {
-        res.status(401).send({
-          message: "incorrect otp",
-        });
-      }
     });
-  });
+});
 
 
 //  ReSend OTP
-
 app.post("/ReSendOTP", (req, res) => {
     if (!req.body.PaymentEmail) {
 
@@ -246,15 +284,16 @@ app.post("/ReSendOTP", (req, res) => {
 
 })
 
+
 // Post conformationPayment
 app.post('/conformationPayment', (req, res, next) => {
-    
+
     if (!req.body.ClientObjectId) {
         res.send("ClientObjectId")
 
     } else {
         clientdata.findById({ _id: req.body.ClientObjectId }, (err, data) => {
-    
+
             if (!err) {
                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",
@@ -272,6 +311,8 @@ app.post('/conformationPayment', (req, res, next) => {
 })
 // Get all Data Payment Api
 
+
+
 app.get('/', (req, res, next) => {
     payment.find({}, (err, data) => {
         if (!err) {
@@ -286,6 +327,8 @@ app.get('/', (req, res, next) => {
     })
 })
 
+
+
 //API to receive filter and return filtered Payments
 app.post('/filteredPayments', (req, res, next) => {
     if (!req.body.filter) {
@@ -295,7 +338,7 @@ app.post('/filteredPayments', (req, res, next) => {
         "filter":"{}",
     `)
     } else {
-        payment.find(  req.body.filter , (err, doc) => {
+        payment.find(req.body.filter, (err, doc) => {
             if (!err) {
                 res.send(doc)
             } else {
@@ -304,43 +347,46 @@ app.post('/filteredPayments', (req, res, next) => {
         })
     }
 })
+
+
 // collectionsby
 app.post('/collectionBy', (req, res, next) => {
-   
-    let item ={
-        name:res.heldby,
-        cheque:0,
-        cash:0,
-        count:0,
-        totalAmount:0
+
+    let item = {
+        name: res.heldby,
+        cheque: 0,
+        cash: 0,
+        count: 0,
+        totalAmount: 0
 
     }
     payment.find({ heldby: req.body.heldby }, (err, data) => {
         if (!err) {
-          //  res.send(data);
-            for (var i=0; i<data.length;i++){
-                item.totalAmount=item.totalAmount+parseInt(data[i].PaymentAmount);
-                item.count=data.length;
-                if(data[i].PaymentMode=="Cash"){
-                   
-                    item.cash+=data[i].PaymentAmount;
-                }else if(data[i].PaymentMode=="Cheque"){
-                   
-                    item.cheque+=parseInt(data[i].PaymentAmount);
-                }
-                else{
-                    item.others+=dparseInt(data[i].PaymentAmount); 
-                }
-console.log("Item",item);
+            //  res.send(data);
+            for (var i = 0; i < data.length; i++) {
+                item.totalAmount = item.totalAmount + parseInt(data[i].PaymentAmount);
+                item.count = data.length;
+                if (data[i].PaymentMode == "Cash") {
 
-        }
-        res.send(item);
+                    item.cash += data[i].PaymentAmount;
+                } else if (data[i].PaymentMode == "Cheque") {
+
+                    item.cheque += parseInt(data[i].PaymentAmount);
+                }
+                else {
+                    item.others += dparseInt(data[i].PaymentAmount);
+                }
+                console.log("Item", item);
+
+            }
+            res.send(item);
         }
         else {
             res.status(500).send("error");
         }
     })
 })
+
 
 app.get('/heldBy', (req, res, next) => {
     payment.find({ heldby: req.body.heldby }, (err, data) => {
@@ -355,80 +401,84 @@ app.get('/heldBy', (req, res, next) => {
 
 /* summary by cashier
 */
+
+
 app.post('/CashierSummary', (req, res, next) => {
-    let collections=[];
-    var cashiers=[];
+    let collections = [];
+    var cashiers = [];
     employee.find({ Role: "Cashier" }, (err, data) => {
         if (!err) {
-            cashiers =data;
-            console.log("Cashiers length",cashiers.length);
-           let result= test(data);
-           res.send(result);
+            cashiers = data;
+            console.log("Cashiers length", cashiers.length);
+            let result = test(data);
+            res.send(result);
         }
     });
     // function test(cashiers){
     //     console.log("Cashiers lengthin test",cashiers.length);   
     //     return"done testing";
     // }
-    console.log("Cashiers outside",cashiers);
-} )
-         function test(cashiers){
-           console.log("Cashiers length in test",cashiers.length); 
-            let collections=[];
-        for (var i=0; i<cashiers.length;i++){
+    console.log("Cashiers outside", cashiers);
+})
+
+
+function test(cashiers) {
+    console.log("Cashiers length in test", cashiers.length);
+    let collections = [];
+    for (var i = 0; i < cashiers.length; i++) {
         //    console.log("in cashier loop");
-            let payments=[];
-            payment.find({ heldby: cashiers[i].employeeName }, (err, data) => {// finding all payments held by cashier
-                if (!err) {
-                    payments=data;// stores all  payments of specific cashier
-                  //  console.log("Payments by casier",cashiers[i].employeeName ,payments.length);
-                    let item= getsummaryItems(cashiers[i].employeeName,payments);
-                    collections.push(item);
-                } 
-                else {
-                    res.status(500).send("errorin finding payments of a cashier");
-                }
-                });
-                let item= getsummaryItems(cashiers[i].employeeName,payments);
+        let payments = [];
+        payment.find({ heldby: cashiers[i].employeeName }, (err, data) => {// finding all payments held by cashier
+            if (!err) {
+                payments = data;// stores all  payments of specific cashier
+                //  console.log("Payments by casier",cashiers[i].employeeName ,payments.length);
+                let item = getsummaryItems(cashiers[i].employeeName, payments);
                 collections.push(item);
-                
-
             }
-          //  console.log("Collections",collections);
-            return collections;
-        }
-           //res.send(collections);
-  
-
-    //- internal function
-        function getsummaryItems(name,payments){
-            let item={
-                employeeNamr:name,
-                cheques:0,
-                cash:0,
-                count:0,
-                others:0,
-                totalAmount:0,
+            else {
+                res.status(500).send("errorin finding payments of a cashier");
             }
-            console.log("in Summary Item",name,payments.length);
-            for (var i=0; i<payments.length;i++){
-                item.totalAmount=item.totalAmount+payments[i].PaymentAmount;
-                item.count=payments.length;
-                if(payments[i].PaymentMode=="Cash"){
-                   
-                    item.cash+=payments[i].PaymentAmount;
-                }else if(payments[i].PaymentMode=="Cheque"){
-                   
-                    item.cheque+=payments[i].PaymentAmount;
-                }
-                else{
-                    item.others+=payments[i].PaymentAmount; 
-                }
+        });
+        let item = getsummaryItems(cashiers[i].employeeName, payments);
+        collections.push(item);
 
 
-        }
-        return item;
     }
+    //  console.log("Collections",collections);
+    return collections;
+}
+//res.send(collections);
+
+
+//- internal function
+function getsummaryItems(name, payments) {
+    let item = {
+        employeeNamr: name,
+        cheques: 0,
+        cash: 0,
+        count: 0,
+        others: 0,
+        totalAmount: 0,
+    }
+    console.log("in Summary Item", name, payments.length);
+    for (var i = 0; i < payments.length; i++) {
+        item.totalAmount = item.totalAmount + payments[i].PaymentAmount;
+        item.count = payments.length;
+        if (payments[i].PaymentMode == "Cash") {
+
+            item.cash += payments[i].PaymentAmount;
+        } else if (payments[i].PaymentMode == "Cheque") {
+
+            item.cheque += payments[i].PaymentAmount;
+        }
+        else {
+            item.others += payments[i].PaymentAmount;
+        }
+
+
+    }
+    return item;
+}
 //     payment.find({ heldby: req.body.heldby }, (err, data) => {
 //         if (!err) {
 //             res.send(data);
@@ -497,36 +547,36 @@ app.get('/ClientData', (req, res, next) => {
 app.post("/ClientDataUpdate", (req, res, next) => {
     // console.log(req.body.id);
     // console.log(req.body.ClientRider);
-  
+
     let updateObj = {};
-  
+
     if (req.body.ClientRider) {
-      updateObj.ClientRider = req.body.ClientRider;
+        updateObj.ClientRider = req.body.ClientRider;
     }
     if (req.body.ClientRiderObjectId) {
-      updateObj.ClientRiderObjectId = req.body.ClientRiderObjectId;
+        updateObj.ClientRiderObjectId = req.body.ClientRiderObjectId;
     }
     if (req.body.CashierName) {
-      updateObj.CashierName = req.body.CashierName;
+        updateObj.CashierName = req.body.CashierName;
     }
     clientdata.findByIdAndUpdate(
-      req.body.id,
-      updateObj,
-      { new: true },
-      (err, data) => {
-        if (!err) {
-          res.send({
-            data: data,
-            message: "Assign Rider Successfully!",
-            // status: 200
-          });
-        } else {
-          res.status(500).send("error happened");
+        req.body.id,
+        updateObj,
+        { new: true },
+        (err, data) => {
+            if (!err) {
+                res.send({
+                    data: data,
+                    message: "Assign Rider Successfully!",
+                    // status: 200
+                });
+            } else {
+                res.status(500).send("error happened");
+            }
         }
-      }
     );
 
-   
+
 })
 
 
