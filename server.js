@@ -120,7 +120,7 @@ app.post("/PaymentData", (req, res, next) => {
 
 
 
-                var receiver = `92${data.PaymentNumber}`
+                var receiver = data.PaymentNumber
                 console.log(receiver, "receiver");
 
                 var textmessage = `Here is verify Otp code: ${otp}`;
