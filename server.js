@@ -166,7 +166,7 @@ app.post("/ReciveOtpStep-2", (req, res, next) => {
               }`);
       return;
     }
-    otpModel.find({ PayObjectId: req.body.PayObjectId }, function (err, otpData) {
+    otpModel.find({ PaymentId: req.body.PayObjectId }, function (err, otpData) {
       if (err) {
         res.status(500).send({
           message: "an error occured: " + JSON.stringify(err),
