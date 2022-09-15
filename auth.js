@@ -41,7 +41,7 @@ app.post('/employe', (req, res, next) => {
 
     } else {
         employee.findOne({ email: req.body.email }, (err, doc) => {
-            if (!err) {
+            if (err) {
                 var employ = new employee({
                     employeeName: req.body.name,
                     employeeEmail: req.body.email,
@@ -58,7 +58,7 @@ app.post('/employe', (req, res, next) => {
                 })
             } else {
                 res.status(409).send({
-                    message: "employee alredy access"
+                    message: "User  alredy exist"
                 })
             }
         }
