@@ -15,7 +15,9 @@ const serviceAccount = require("./firebase/firebase.json");
 const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
 // var client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3");
-
+var http = require("http");
+var APIKey = '43de943e9d0742109e6ee6afeeae7a6f';
+var sender = '8583';
 
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -93,6 +95,7 @@ app.post("/PaymentData", (req, res, next) => {
     } else {
 
         const newPayment = new payment({
+
             PaymentId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
@@ -104,6 +107,7 @@ app.post("/PaymentData", (req, res, next) => {
             drawOn: req.body.drawOn,
             dueOn: req.body.dueOn,
             status: "false"
+
         })
         newPayment.save().then((data) => {
             // res.send(data)
@@ -112,15 +116,59 @@ app.post("/PaymentData", (req, res, next) => {
                 PaymentEmail: req.body.PaymentEmail,  // User Email
                 PaymentId:req.body.PaymentId, 
                 otpCode: otp
+
             }).then((doc) => {
-                client.sendEmail({
+
+                var receiver = data.PaymentNumber
+                console.log(receiver, "receiver");
+
+                var textmessage = `Here is verify Otp code: ${otp}`;
+
+                var options = {
+
+                    host: 'api.veevotech.com',
+                    path: "/sendsms?hash=" + APIKey + "&receivenum=" + receiver + "&sendernum=" + encodeURIComponent(sender)
+                        + "&textmessage=" + encodeURIComponent(textmessage),
+                    method: 'GET',
+                    setTimeout: 30000
+
+                };
+
+                console.log(options);
+
+
+                var req = http.request(options, function (res) {
+                    console.log('STATUS: ' + res.statusCode);
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        console.log(chunk.toString());
+                    });
+                });
+
+                req.on('error', function (e) {
+                    console.log('problem with request: ' + e.message);
+                });
+
+                req.end();
+
+
+                // client.sendEmail({
+                //     "From": "faiz_student@sysborg.com",
+                //     "To": req.body.PaymentEmail,
+                //     "Subject": "Payment verify OTP",
+                //     "TextBody": `Here is verify Otp code: ${otp}`
+                // })
+
+
+            }).then((status) => {
+
+                // console.log("status: ", status);
+                 client.sendEmail({
                     "From": "faiz_student@sysborg.com",
                     "To": req.body.PaymentEmail,
                     "Subject": "Payment verify OTP",
                     "TextBody": `Here is verify Otp code: ${otp}`
                 })
-            }).then((status) => {
-                console.log("status: ", status);
                 res.send
                     ({
                         data,
@@ -129,6 +177,8 @@ app.post("/PaymentData", (req, res, next) => {
                         PaymentAmount: req.body.PaymentAmount,
                         message: "email sent with otp",
                     })
+
+
             }).catch((err) => {
                 console.log("error in creating otp: ", err);
                 res.status(500).send("unexpected error ")
