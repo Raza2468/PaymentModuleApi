@@ -36,36 +36,33 @@ app.post('/login', (req, res, next) => {
 
 // Create Empolyee
 
-app.post('/employe', (req, res, next) => {
+app.post("/employe", (req, res, next) => {
     if (!req.body.email || !req.body.password) {
-
     } else {
-        employee.findOne({ email: req.body.email }, (err, doc) => {
-            if (err) {
-                var employ = new employee({
-                    employeeName: req.body.name,
-                    employeeEmail: req.body.email,
-                    employeePassword: req.body.password,
-                    createdBy: req.body.createdBy,
-                    Role: req.body.Role
-                })
-                employ.save((err, doc) => {
-                    if (!err) {
-                        res.send({ message: "Employee created" })
-                    } else {
-                        res.status(500).send("user create error, " + err)
-                    }
-                })
+      employee.findOne({ employeeEmail: req.body.email }, (err, doc) => {
+        if (!err && !doc) {
+          var employ = new employee({
+            employeeName: req.body.name,
+            employeeEmail: req.body.email,
+            employeePassword: req.body.password,
+            createdBy: req.body.createdBy,
+            Role: req.body.Role,
+          });
+          employ.save((err, doc) => {
+            if (!err) {
+              res.send({ message: "Employee created", doc });
             } else {
-                res.status(409).send({
-                    message: "User  alredy exist"
-                })
+              res.status(500).send("Employee create error, " + err);
             }
+          });
+        } else {
+          res.status(409).send({
+            message: "Employee  alredy exist",
+          });
         }
-
-        )
+      });
     }
-})
+  });
 
 // Super Admin 
 app.get('/employe', (req, res, next) => {
