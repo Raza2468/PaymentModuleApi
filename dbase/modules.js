@@ -52,7 +52,7 @@ var otpModel = mongoose.model("otps", otpSchema);
 
 //  PaymentSchema Start
 var paymentSchema = mongoose.Schema({
-    PaymentId: String,
+    PaymentClientId: String,
     PaymentName: String,
     PaymentEmail: String,
     PaymentNumber: String,

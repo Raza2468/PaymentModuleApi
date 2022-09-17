@@ -96,7 +96,7 @@ app.post("/PaymentData", (req, res, next) => {
 
         const newPayment = new payment({
 
-            PaymentId: req.body.PaymentId,  // user.clientID 
+            PaymentClientId: req.body.PaymentId,  // user.clientID 
             PaymentName: req.body.PaymentName,  // user.clientName 
             PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
             PaymentNumber: req.body.PaymentNumber,
@@ -114,7 +114,7 @@ app.post("/PaymentData", (req, res, next) => {
             const otp = Math.floor(getRandomArbitrary(1111, 9999))
             otpModel.create({
                 PaymentEmail: req.body.PaymentEmail,  // User Email
-                PaymentId:req.body.PaymentId, 
+                PaymentId:data._id, 
                 otpCode: otp
 
             }).then((doc) => {
@@ -224,9 +224,9 @@ app.post("/ReciveOtpStep-2", (req, res, next) => {
       } else if (otpData) {
         otpData = otpData[otpData.length - 1];
   
-        const now = new Date().getTime();
-        const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
-        const diff = now - otpIat; // 300000 5 minute
+        // const now = new Date().getTime();
+        // const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
+        // const diff = now - otpIat; // 300000 5 minute
   
         if (otpData.otpCode === req.body.otp) {
           //&& diff < 300000
