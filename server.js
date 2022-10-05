@@ -355,6 +355,26 @@ app.post('/checkExist', (req, res, next) => {
     }
 })
 
+
+//API to receive filter and return multi filtered Payments
+app.post('/multiFilteredPayments', (req, res, next) => {
+    if (!req.body.filter) {
+        res.status(409).send(`
+        Please send filter in json body
+        e.g:
+        "filter":"{}",
+    `)
+    } else {
+        payment.find(  req.body.filter , (err, doc) => {
+            if (!err) {
+                res.send(doc)
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
+
 //API to receive filter and return filtered Payments
 app.post('/filteredPayments', (req, res, next) => {
     if (!req.body.filter) {
