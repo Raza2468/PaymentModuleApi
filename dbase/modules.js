@@ -81,6 +81,7 @@ var clientSchema = mongoose.Schema({
     ClientEmail: String,
     ClientRider: String,
     ClientRiderObjectId: String,
+    AssignedBy: String,
     CashierName: String,
     BelongsTo: String,
     "createdOn": { "type": Date, "default": Date.now }

@@ -597,7 +597,12 @@ app.post("/ClientDataUpdate", (req, res, next) => {
     }
     if (req.body.CashierName) {
       updateObj.CashierName = req.body.CashierName;
+      
     }
+    if (req.body.AssignedBy) {
+        updateObj.AssignedBy = req.body.AssignedBy;
+        
+      }
     clientdata.findByIdAndUpdate(
       req.body.id,
       updateObj,
