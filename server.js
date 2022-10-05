@@ -335,6 +335,25 @@ app.get('/', (req, res, next) => {
         }
     })
 })
+//API to check how many payment Exist
+app.post('/checkExist', (req, res, next) => {
+    if (!req.body.filter) {
+        res.status(409).send(`
+        Please send filter in json body
+        e.g:
+        "filter":"{}",
+    `)
+    } else {
+        payment.find(  req.body.filter , (err, doc) => {
+            if (!err) {
+                
+                res.send(doc.length.toString());
+            } else {
+                res.send(err)
+            }
+        })
+    }
+})
 
 //API to receive filter and return filtered Payments
 app.post('/filteredPayments', (req, res, next) => {
