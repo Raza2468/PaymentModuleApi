@@ -94,6 +94,7 @@ app.post("/PaymentData", (req, res, next) => {
         return;
     } else {
 
+        const otp = Math.floor(getRandomArbitrary(1111, 9999))
         const newPayment = new payment({
 
             PaymentClientId: req.body.PaymentId,  // user.clientID 
@@ -106,12 +107,13 @@ app.post("/PaymentData", (req, res, next) => {
             heldby: req.body.heldby,
             drawOn: req.body.drawOn,
             dueOn: req.body.dueOn,
+            VerificationCode:otp,
             status: "false"
 
         })
         newPayment.save().then((data) => {
             // res.send(data)
-            const otp = Math.floor(getRandomArbitrary(1111, 9999))
+           
             otpModel.create({
                 PaymentEmail: req.body.PaymentEmail,  // User Email
                 PaymentId:data._id, 
@@ -122,7 +124,7 @@ app.post("/PaymentData", (req, res, next) => {
                 var receiver = data.PaymentNumber
                 console.log(receiver, "receiver");
 
-                var textmessage = `Here is verify Otp code: ${otp}`;
+                var textmessage = `Your Payment Verification Code is: ${otp}`;
 
                 var options = {
 
@@ -152,12 +154,7 @@ app.post("/PaymentData", (req, res, next) => {
                 req.end();
 
 
-                // client.sendEmail({
-                //     "From": "faiz_student@sysborg.com",
-                //     "To": req.body.PaymentEmail,
-                //     "Subject": "Payment verify OTP",
-                //     "TextBody": `Here is verify Otp code: ${otp}`
-                // })
+             
 
 
             }).then((status) => {
