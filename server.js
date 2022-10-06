@@ -107,6 +107,7 @@ app.post("/PaymentData", (req, res, next) => {
             heldby: req.body.heldby,
             drawOn: req.body.drawOn,
             dueOn: req.body.dueOn,
+            AssignedBy: req.AssignedBy,
             VerificationCode:otp,
             status: "false"
 
