@@ -109,7 +109,7 @@ app.post("/PaymentData", (req, res, next) => {
             dueOn: req.body.dueOn,
             AssignedBy: req.AssignedBy,
             VerificationCode:otp,
-            status: "false"
+            status: req.body.status
 
         })
         newPayment.save().then((data) => {
