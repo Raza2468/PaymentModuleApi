@@ -82,7 +82,6 @@ app.post("/upload", upload.any(), (req, res, next) => {
 // PaymentData Api
 
 app.post("/PaymentData", (req, res, next) => {
-
     if (!req.body.PaymentId) {
         res.status(409).send(`
                     Please send PaymentName  in json body
@@ -93,13 +92,11 @@ app.post("/PaymentData", (req, res, next) => {
                 `)
         return;
     } else {
-
         const otp = Math.floor(getRandomArbitrary(1111, 9999))
         const newPayment = new payment({
-
-            PaymentClientId: req.body.PaymentId,  // user.clientID 
-            PaymentName: req.body.PaymentName,  // user.clientName 
-            PaymentEmail: req.body.PaymentEmail,  // user.clientEmail 
+            PaymentClientId: req.body.PaymentId,  // user.clientID
+            PaymentName: req.body.PaymentName,  // user.clientName
+            PaymentEmail: req.body.PaymentEmail,  // user.clientEmail
             PaymentNumber: req.body.PaymentNumber,
             PaymentAmount: req.body.PaymentAmount,
             PaymentMode: req.body.PaymentMode,
@@ -108,80 +105,37 @@ app.post("/PaymentData", (req, res, next) => {
             drawOn: req.body.drawOn,
             dueOn: req.body.dueOn,
             AssignedBy: req.body.AssignedBy,
-            VerificationCode:otp,
+            VerificationCode: otp,
             status: req.body.status
-
-        })
-        newPayment.save().then((data) => {
-            // res.send(data)
-           
-            otpModel.create({
-                PaymentEmail: req.body.PaymentEmail,  // User Email
-                PaymentId:data._id, 
-                otpCode: otp
-
-            }).then((doc) => {
-
-                var receiver = data.PaymentNumber
-                console.log(receiver, "receiver");
-
-                var textmessage = `Your Payment Verification Code is: ${otp}`;
-
-                var options = {
-
-                    host: 'api.veevotech.com',
-                    path: "/sendsms?hash=" + APIKey + "&receivenum=" + receiver + "&sendernum=" + encodeURIComponent(sender)
-                        + "&textmessage=" + encodeURIComponent(textmessage),
-                    method: 'GET',
-                    setTimeout: 30000
-
-                };
-
-                console.log(options);
-
-
-                var req = http.request(options, function (res) {
-                    console.log('STATUS: ' + res.statusCode);
-                    res.setEncoding('utf8');
-                    res.on('data', function (chunk) {
-                        console.log(chunk.toString());
-                    });
-                });
-
-                req.on('error', function (e) {
-                    console.log('problem with request: ' + e.message);
-                });
-
-                req.end();
-
-
-             
-
-
-            }).then((status) => {
-
-                // console.log("status: ", status);
-                 client.sendEmail({
-                    "From": "faiz_student@sysborg.com",
-                    "To": req.body.PaymentEmail,
-                    "Subject": "Payment verify OTP",
-                    "TextBody": `Here is verify Otp code: ${otp}`
-                })
-                res.send
-                    ({
-                        data,
-                        PaymentId: req.body.PaymentId,
-                        PaymentName: req.body.PaymentName,
-                        PaymentAmount: req.body.PaymentAmount,
-                        message: "email sent with otp",
-                    })
-
-
-            }).catch((err) => {
-                console.log("error in creating otp: ", err);
-                res.status(500).send("unexpected error ")
+        }).save().then((data) => {
+            //  Send OTP with SMS
+            let receiver = data.PaymentNumber
+            let textmessage = `Your Payment Verification Code is: ${otp}`;
+            let options = {
+                host: 'api.veevotech.com',
+                path: "/sendsms?hash=" + APIKey + "&receivenum=" + receiver + "&sendernum=" + encodeURIComponent(sender) + "&textmessage=" + encodeURIComponent(textmessage),
+                method: 'GET',
+                setTimeout: 30000
+            };
+            let req = http.request(options, (res) => {
+                res.setEncoding('utf8');
+                res.on('data', (chunk) => { console.log(chunk.toString()) });
+                console.log('STATUS: ' + res.statusCode);
+            });
+            req.on('error', function (e) {
+                console.log('problem with request: ' + e.message);
+            });
+            console.log(options, "options");
+            console.log(receiver, "receiver");
+            req.end();
+            // Send OTP with Email
+            client.sendEmail({
+                "From": "faiz_student@sysborg.com",
+                "To": data.PaymentEmail,
+                "Subject": "Payment verify OTP",
+                "TextBody": `Here is verify Otp code: ${otp}`
             })
-
+            res.send(data)
         }).catch((err) => {
             res.status(500).send({
                 message: "an error occured : " + err,
