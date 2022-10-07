@@ -204,94 +204,58 @@ function getRandomArbitrary(min, max) {
 
 app.post("/ReciveOtpStep-2", (req, res, next) => {
     if (!req.body.PayObjectId || !req.body.otp || !req.body.status) {
-      res.status(403).send(`
+        res.status(403).send(`
               please send email & otp in json body.
               e.g:
               {
                   "email": "faizeraza2468@gmail.com",
                   "PaymentId": "xxxxxx",
-                  "otp": "xxxxx" 
+                  "otp": "xxxxx"
               }`);
-      return;
+        return;
     }
-    otpModel.find({ PaymentId: req.body.PayObjectId }, function (err, otpData) {
-      if (err) {
-        res.status(500).send({
-          message: "an error occured: " + JSON.stringify(err),
-        });
-      } else if (otpData) {
-        otpData = otpData[otpData.length - 1];
-  
-        // const now = new Date().getTime();
-        // const otpIat = new Date(otpData.createdOn).getTime(); // 2021-01-06T13:08:33.657+0000
-        // const diff = now - otpIat; // 300000 5 minute
-  
-        if (otpData.otpCode === req.body.otp) {
-          //&& diff < 300000
-          // otpData.remove()
-  
-          payment.findOne({ _id: req.body.PayObjectId }, (err, user) => {
-            if (err) {
-              res.send(err);
-            } else {
-              user.update({ status: req.body.status }, (err, data) => {
-                if (!err) {
-                  res.send({
-                    message: "Stutus update",
-                    user,
-                    data,
-                  });
-                  console.log(user.PaymentEmail);
-                  client.sendEmail({
+    payment.findOne({ _id: req.body.PayObjectId }, (err, otpData) => {
+        // otpData = otpData[otpData.length - 1];
+        console.log(otpData);
+        if (otpData.VerificationCode === req.body.otp) {
+            otpData.update({ status: req.body.status }, (err, data) => {
+                client.sendEmail({
                     From: "faiz_student@sysborg.com",
-                    To: user.PaymentEmail,
+                    To: otpData.PaymentEmail,
                     Subject: "Thank for Payment is Recived",
                     TextBody: `payment is successfully recorded in our system.`,
-                  });
-                } else {
-                  console.log(err);
-                }
-              });
-            }
-          });
+                });
+            })
+            res.send(otpData)
         } else {
-          res.status(401).send({
-            message: "incorrect otp",
-          });
+            res.status(500).send({
+                message: " do you have correct OTP an error occured:" + JSON.stringify(err),
+            });
         }
-      } else {
-        res.status(401).send({
-          message: "incorrect otp",
-        });
-      }
-    });
-  });
-
+    })
+});
 
 //  ReSend OTP
 
-app.post("/ReSendOTP", (req, res) => {
-    if (!req.body.PaymentEmail) {
-
+aapp.post("/ReSendOTP", (req, res) => {
+    if (!req.body.PayObjectId) {
         res.send("email")
     } else {
-        otpModel.find({ PaymentId: req.body.PaymentId },
-            function (err, otpData) {
-                if (!err) {
-                    client.sendEmail({
-                        "From": "faiz_student@sysborg.com",
-                        "To": req.body.PaymentEmail,
-                        "Subject": "Resend Payment verify OTP",
-                        "TextBody": `Here is verify Otp code: ${otpData = otpData[otpData.length - 1].otpCode.toString()}`
-                    })
-                    res.send("Please Check the email")
-                } else {
-                    res.send(err)
-
-                }
-            })
+        payment.findOne({ _id: req.body.PayObjectId }, (err, data) => {
+            // console.log(data);
+            if (!err) {
+                client.sendEmail({
+                    "From": "faiz_student@sysborg.com",
+                    "To": data.PaymentEmail,
+                    "Subject": "Resend Payment verify OTP",
+                    "TextBody": `Here is verify Otp code: ${data.VerificationCode.toString()}`
+                })
+                res.send("Please Check the email")
+            } else {
+                res.send(err)
+            }
+        })
     }
-
 })
 
 // Post conformationPayment
