@@ -37,21 +37,21 @@ process.on('SIGINT', function () {/////this function will run jst before app is 
 
 
 // otpSchema Start
-var otpSchema = new mongoose.Schema({
+let otpSchema = new mongoose.Schema({
     "PaymentEmail": String,
-    
+
     "ClientId": String,
-    "PaymentId":String,
+    "PaymentId": String,
     "otpCode": String,
     "createdOn": { "type": Date, "default": Date.now },
 });
-var otpModel = mongoose.model("otps", otpSchema);
+let otpModel = mongoose.model("otps", otpSchema);
 
 // otpSchema End
 
 
 //  PaymentSchema Start
-var paymentSchema = mongoose.Schema({
+let paymentSchema = mongoose.Schema({
     PaymentClientId: String,
     PaymentName: String,
     PaymentEmail: String,
@@ -60,7 +60,7 @@ var paymentSchema = mongoose.Schema({
     imageUrl: String,
     PaymentMode: String,
     AssignedBy: String,
-   VerificationCode:String,
+    VerificationCode: String,
     BelongsTo: String,
     heldby: String,
     drawOn: String,
@@ -69,14 +69,14 @@ var paymentSchema = mongoose.Schema({
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var payment = mongoose.model("payment", paymentSchema);
+let payment = mongoose.model("payment", paymentSchema);
 
 //  PaymentSchema End
 
 
 
 // Client Data Start
-var clientSchema = mongoose.Schema({
+let clientSchema = mongoose.Schema({
     ClientId: String,
     ClientName: String,
     ClientPhoneNumber: String,
@@ -90,10 +90,10 @@ var clientSchema = mongoose.Schema({
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var clientdata = mongoose.model("client", clientSchema);
+let clientdata = mongoose.model("client", clientSchema);
 
 
-var employSchema = mongoose.Schema({
+let employSchema = mongoose.Schema({
     employeeName: String,
     employeeEmail: String,
     employeePassword: String,
@@ -102,23 +102,23 @@ var employSchema = mongoose.Schema({
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var employee = mongoose.model("employe", employSchema);
+let employee = mongoose.model("employe", employSchema);
 
 // Client Data End
 
 
 
-var TransactionSchema = mongoose.Schema({
+let TransactionSchema = mongoose.Schema({
     Nature: String,
     Instrument: Array,
     PaymentAmount: Array,
     BelongsTo: String,
-    From: String,   
+    From: String,
     to: String,
     "createdOn": { "type": Date, "default": Date.now }
 })
 
-var Transaction = mongoose.model('Transaction', TransactionSchema)
+let Transaction = mongoose.model('Transaction', TransactionSchema)
 
 module.exports = {
 
