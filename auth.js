@@ -4,6 +4,31 @@ const { employee, payment, Transaction, clientdata } = require("./dbase/modules"
 
 var app = express.Router()
 
+// change password
+app.post("/ChangePassword", (req, res, next) => {
+    console.log(req.body.employeePassword);
+    if (!req.body.empolyeeObjectId) {
+  res.send("empolyeeObjectId has been required")
+    } else {
+        employee.findById({ _id: req.body.empolyeeObjectId }, (err, doc) => {
+            if (!err) {
+                if (req.body.employeePassword === doc.employeePassword) {
+                    doc.update({ employeePassword: req.body.newPassword }, {}, function (err, data) {
+                        console.log("password updated");
+                        res.send("Password has been Change Successfull")
+                    })
+                } else {
+                   res.send("Please Correct the Password");
+                  }
+                } else {
+              res.send("Empolyee not found");
+            }
+        })
+    }
+  })
+
+
+
 // login
 
 app.post('/login', (req, res, next) => {
