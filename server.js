@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const postmark = require("postmark");
 const app = express()
 let authRoutes = require("./auth");
+var nodemailer = require('nodemailer');
 
 
 const { ServerSecretKey, PORT } = require("./core/index")
@@ -19,6 +20,14 @@ let http = require("http");
 let APIKey = '43de943e9d0742109e6ee6afeeae7a6f';
 let sender = '8583';
 
+const transporter = nodemailer.createTransport({
+    host: 'smtpout.secureserver.net',
+    port: 465,
+    auth: {
+        user: 'info@tecstik.com',
+        pass: 'anostrat'
+    }
+});
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({
@@ -104,6 +113,7 @@ app.post("/PaymentData", (req, res, next) => {
             AssignedBy: req.body.AssignedBy,
             VerificationCode: otp,
             status: req.body.status
+            
         }).save().then((data) => {
             //  Send OTP with SMS
             let receiver = data.PaymentNumber
@@ -125,13 +135,29 @@ app.post("/PaymentData", (req, res, next) => {
             console.log(options, "options");
             console.log(receiver, "receiver");
             req.end();
+            
             // Send OTP with Email
-            client.sendEmail({
-                "From": "faiz_student@sysborg.com",
-                "To": data.PaymentEmail,
-                "Subject": "Payment verify OTP",
-                "TextBody": `Here is verify Otp code: ${otp}`
-            })
+            var mailOptions = {
+                from: 'from_address@example.com',
+                to: data.PaymentEmail,
+                subject: 'Payment verify OTP',
+                html: `<h1> Here is verify Otp code: ${otp}</h1>`
+            }
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log("error=>", error);
+                } else {
+                    console.log('Email sent: =>' + info.response);
+                }
+            });
+
+            // client.sendEmail({
+            //     "From": "faiz_student@sysborg.com",
+            //     "To": data.PaymentEmail,
+            //     "Subject": "Payment verify OTP",
+            //     "TextBody": `Here is verify Otp code: ${otp}`
+            // })
             res.send(data)
         }).catch((err) => {
             res.status(500).send({
