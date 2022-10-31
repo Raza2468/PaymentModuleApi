@@ -138,7 +138,7 @@ app.post("/PaymentData", (req, res, next) => {
             
             // Send OTP with Email
             var mailOptions = {
-                from: 'from_address@example.com',
+                from: 'info@tecstik.com',
                 to: data.PaymentEmail,
                 subject: 'Payment verify OTP',
                 html: `<h1> Here is verify Otp code: ${otp}</h1>`
