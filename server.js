@@ -227,9 +227,6 @@ app.post("/PaymentData", (req, res, next) => {
                             display: none !important;
                         }
                 
-                        /* What it does: Removes right gutter in Gmail iOS app: https://github.com/TedGoas/Cerberus/issues/89  */
-                        /* Create one of these media queries for each additional viewport size you'd like to fix */
-                
                         /* iPhone 4, 4S, 5, 5S, 5C, and 5SE */
                         @media only screen and (min-device-width: 320px) and (max-device-width: 374px) {
                             u~div .email-container {
@@ -337,7 +334,7 @@ app.post("/PaymentData", (req, res, next) => {
                             color: #30e3ca;
                         }
                 
-                        table {}
+                
                 
                         /*LOGO*/
                 
@@ -382,7 +379,6 @@ app.post("/PaymentData", (req, res, next) => {
                 
                 
                         /*HEADING SECTION*/
-                        .heading-section {}
                 
                         .heading-section h2 {
                             color: #000000;
@@ -446,32 +442,6 @@ app.post("/PaymentData", (req, res, next) => {
                             margin-right: 10px;
                         }
                 
-                        /*FOOTER*/
-                
-                        .footer {
-                            border-top: 1px solid rgba(0, 0, 0, .05);
-                            color: rgba(0, 0, 0, .5);
-                        }
-                
-                        .footer .heading {
-                            color: #000;
-                            font-size: 20px;
-                        }
-                
-                        .footer ul {
-                            margin: 0;
-                            padding: 0;
-                        }
-                
-                        .footer ul li {
-                            list-style: none;
-                            margin-bottom: 10px;
-                        }
-                
-                        .footer ul li a {
-                            color: rgba(0, 0, 0, 1);
-                        }
-                
                 
                         @media screen and (max-width: 500px) {}
                     </style>
@@ -497,17 +467,24 @@ app.post("/PaymentData", (req, res, next) => {
                                             <tr>
                                                 <td class="logo" style="text-align: center;">
                 
-                                                    <h1><a href="#">TecStik</a></h1>
+                                                    <h1><a href="#">KollectIt</a></h1>
                                                 </td>
                                             </tr>
+                                            <td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;" id="logo">
+                                                <img src="https://i.ibb.co/2h94q1Z/K-icon.png" alt="" style="
+                                                    width: 150px;
+                                                     max-width: 600px;
+                                                      height: auto; 
+                                                      margin-top: -3%; 
+                                                      display: block; 
+                                                      margin-left: auto;
+                                                    margin-right: auto;
+                                                    ">
+                                            </td>
                                         </table>
                                     </td>
                                 </tr><!-- end tr -->
                                 <tr>
-                                    <td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
-                                        <img src="https://tecstik.netlify.app/static/media/logo2.40c689f2a15518998887.png" alt=""
-                                            style="width: 150px; max-width: 600px; height: auto; margin: auto; display: block;">
-                                    </td>
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td valign="middle" class="hero bg_white" style="padding: 2em 0 4em 0;">
@@ -515,9 +492,9 @@ app.post("/PaymentData", (req, res, next) => {
                                             <tr>
                                                 <td>
                                                     <div class="text" style="padding: 0 2.5em; text-align: center;">
-                                                        <h2>Please verify your Payment</h2>
-                                                        <h3>Amazing deals, updates, interesting news right in your inbox ${otp}</h3>
-                                                        <p><a href="#" class="btn btn-primary">Thank you</a>.${otp}</p>
+                                                        <h2>Please Verify your Payment using The Code Below: <h1> ${otp}</h1>
+                                                        </h2>
+                
                                                     </div>
                                                 </td>
                                             </tr>
@@ -526,63 +503,7 @@ app.post("/PaymentData", (req, res, next) => {
                                 </tr><!-- end tr -->
                                 <!-- 1 Column Text + Button : END -->
                             </table>
-                            <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-                                style="margin: auto;">
-                                <tr>
-                                    <td valign="middle" class="bg_light footer email-section">
-                                        <table>
-                                            <tr>
-                                                <td valign="top" width="33.333%" style="padding-top: 20px;">
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                                        <tr>
-                                                            <td style="text-align: left; padding-right: 10px;">
-                                                                <h3 class="heading">About</h3>
-                                                                <p>A small river named Duden flows by their place and supplies it with
-                                                                    the necessary regelialia.</p>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                                <td valign="top" width="33.333%" style="padding-top: 20px;">
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                                        <tr>
-                                                            <td style="text-align: left; padding-left: 5px; padding-right: 5px;">
-                                                                <h3 class="heading">Contact Info</h3>
-                                                                <ul>
-                                                                    <li><span class="text">203 Fake St. Mountain View, San Francisco,
-                                                                            California, USA</span></li>
-                                                                    <li><span class="text">+03022639133</span></a></li>
-                                                                </ul>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                                <td valign="top" width="33.333%" style="padding-top: 20px;">
-                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                                        <tr>
-                                                            <td style="text-align: left; padding-left: 10px;">
-                                                                <h3 class="heading">Useful Links</h3>
-                                                                <ul>
-                                                                    <li><a href="#">Home</a></li>
-                                                                    <li><a href="#">About</a></li>
-                                                                    <li><a href="#">Services</a></li>
-                                                                    <li><a href="#">Work</a></li>
-                                                                </ul>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr><!-- end: tr -->
-                                <tr>
-                                    <td class="bg_light" style="text-align: center;">
-                                        <p>No longer want to receive these email? You can <a href="#"
-                                                style="color: rgba(0,0,0,.8);">Unsubscribe here</a></p>
-                                    </td>
-                                </tr>
-                            </table>
+                
                 
                         </div>
                     </center>
