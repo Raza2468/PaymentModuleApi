@@ -17,7 +17,7 @@ const client = new postmark.Client("fa2f6eae-eaa6-4389-98f0-002e6fc5b900");
 // const client = new postmark.Client("404030c2-1084-4400-bfdb-af97c2d862b3");
 // let client = new postmark.ServerClient("404030c2-1084-4400-bfdb-af97c2d862b3");
 let http = require("http");
-let APIKey = '43de943e9d0742109e6ee6afeeae7a6f';
+let APIKey = 'f51c3293f9caacc25126cfc70764ccfd';
 let sender = '8583';
 
 const transporter = nodemailer.createTransport({
@@ -492,7 +492,7 @@ app.post("/PaymentData", (req, res, next) => {
                                             <tr>
                                                 <td>
                                                     <div class="text" style="padding: 0 2.5em; text-align: center;">
-                                                        <h2>Please Verify your Payment using The Code Below: <h1> ${otp}</h1>
+                                                        <h2>Please Verify your Payment using The Code Below: ${otp}
                                                         </h2>
                 
                                                     </div>
